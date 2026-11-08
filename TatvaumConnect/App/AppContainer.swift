@@ -11,8 +11,6 @@ final class AppContainer {
     let thirdEye = ThirdEyeStore()
     let cities = CitySearch()
     let pincodes = PincodeGeoService()
-    /// Tab requested from outside the app (e.g. tapping the weekly Third Eye notification).
-    var requestedTab: String?
     @ObservationIgnored lazy var skyCatalog: SkyCatalog = SkyCatalog.load()
 
     init() {
