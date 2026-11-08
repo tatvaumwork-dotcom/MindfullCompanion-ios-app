@@ -248,7 +248,6 @@ private struct OrreryView: View {
     }
 
     private func draw(_ ctx: GraphicsContext, _ size: CGSize, yaw: Double) {
-        var ctx = ctx
         let cx = size.width / 2, cy = size.height / 2, m = min(size.width, size.height)
         let radius = m * 0.36 * zoom, cp = cos(pitch), sp = sin(pitch)
         func project(_ lon: Double, _ r: Double, _ h: Double = 0) -> (p: CGPoint, s: Double, d: Double) {
