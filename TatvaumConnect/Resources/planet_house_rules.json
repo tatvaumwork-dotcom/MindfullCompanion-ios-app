@@ -1,0 +1,1827 @@
+{
+    "Sun": {
+        "Aries": {
+            "Normal": {
+                "behavior": [
+                    "Strong identity",
+                    "leadership focus on self",
+                    "authority through personality"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Identity confusion",
+                    "inward leadership",
+                    "delayed self-confidence"
+                ]
+            }
+        },
+        "Taurus": {
+            "Normal": {
+                "behavior": [
+                    "Ego tied to wealth",
+                    "speech authority",
+                    "family pride"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Reworking values",
+                    "delayed wealth confidence",
+                    "speech restraint"
+                ]
+            }
+        },
+        "Gemini": {
+            "Normal": {
+                "behavior": [
+                    "Courageous self-expression",
+                    "dominant communication"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Hesitant expression",
+                    "inner courage development"
+                ]
+            }
+        },
+        "Cancer": {
+            "Normal": {
+                "behavior": [
+                    "Pride in home",
+                    "emotional authority",
+                    "attachment to roots"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Detached pride in home",
+                    "emotional reassessment"
+                ]
+            }
+        },
+        "Leo": {
+            "Normal": {
+                "behavior": [
+                    "Creative ego",
+                    "leadership through intelligence or children"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed creativity",
+                    "internalized ego"
+                ]
+            }
+        },
+        "Virgo": {
+            "Normal": {
+                "behavior": [
+                    "Authority in service",
+                    "competitive leadership",
+                    "conflict with equals"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Authority struggles",
+                    "internal competition"
+                ]
+            }
+        },
+        "Libra": {
+            "Normal": {
+                "behavior": [
+                    "Ego clashes in partnerships",
+                    "dominant spouse themes"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed marriage authority",
+                    "ego lessons through partners"
+                ]
+            }
+        },
+        "Scorpio": {
+            "Normal": {
+                "behavior": [
+                    "Hidden power",
+                    "transformative identity",
+                    "secret authority"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Deep karmic identity shifts",
+                    "hidden ego crises"
+                ]
+            }
+        },
+        "Sagittarius": {
+            "Normal": {
+                "behavior": [
+                    "Moral leadership",
+                    "dharmic pride",
+                    "teacher archetype"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Questioning beliefs",
+                    "inner guru development"
+                ]
+            }
+        },
+        "Capricorn": {
+            "Normal": {
+                "behavior": [
+                    "Public authority",
+                    "career dominance",
+                    "government success"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed career authority",
+                    "late recognition"
+                ]
+            }
+        },
+        "Aquarius": {
+            "Normal": {
+                "behavior": [
+                    "Ego through networks",
+                    "leadership in groups",
+                    "ambition"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Unconventional ambitions",
+                    "selective networks"
+                ]
+            }
+        },
+        "Pisces": {
+            "Normal": {
+                "behavior": [
+                    "Ego dissolution",
+                    "spiritual authority",
+                    "foreign connections"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Strong inward spirituality",
+                    "ego withdrawal"
+                ]
+            }
+        }
+    },
+    "Moon": {
+        "Aries": {
+            "Normal": {
+                "behavior": [
+                    "Emotion-driven personality",
+                    "sensitive self-image"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Mood swings",
+                    "identity insecurity",
+                    "inward emotions"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Emotional suppression",
+                    "identity burnout"
+                ]
+            }
+        },
+        "Taurus": {
+            "Normal": {
+                "behavior": [
+                    "Emotional attachment to family",
+                    "food",
+                    "and speech"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Emotional detachment from family",
+                    "speech restraint"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Dry emotions",
+                    "harsh speech tendencies"
+                ]
+            }
+        },
+        "Gemini": {
+            "Normal": {
+                "behavior": [
+                    "Expressive emotions",
+                    "talkative",
+                    "restless mind"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Overthinking communication",
+                    "mental restlessness"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Nervous communication",
+                    "emotional irritability"
+                ]
+            }
+        },
+        "Cancer": {
+            "Normal": {
+                "behavior": [
+                    "Strong nurturing instinct",
+                    "emotional security focus"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Emotional distance from mother/home"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Lack of inner peace",
+                    "home dissatisfaction"
+                ]
+            }
+        },
+        "Leo": {
+            "Normal": {
+                "behavior": [
+                    "Romantic mind",
+                    "emotional creativity"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed romance",
+                    "emotional confusion in creativity"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Emotional creativity blocked",
+                    "romance burnout"
+                ]
+            }
+        },
+        "Virgo": {
+            "Normal": {
+                "behavior": [
+                    "Emotional stress",
+                    "service-oriented worries"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Anxiety",
+                    "emotional burnout through service"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Stress-related health issues",
+                    "emotional fatigue"
+                ]
+            }
+        },
+        "Libra": {
+            "Normal": {
+                "behavior": [
+                    "Emotionally dependent partnerships"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Revisiting past relationships",
+                    "emotional dependency"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Cold relationships",
+                    "lack of emotional support"
+                ]
+            }
+        },
+        "Scorpio": {
+            "Normal": {
+                "behavior": [
+                    "Intense emotions",
+                    "psychological depth"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Psychic overload",
+                    "emotional extremes"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Emotional instability",
+                    "fear-based reactions"
+                ]
+            }
+        },
+        "Sagittarius": {
+            "Normal": {
+                "behavior": [
+                    "Faith-driven emotions",
+                    "love for learning"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Questioning faith",
+                    "inner belief restructuring"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Faith crisis",
+                    "loss of emotional guidance"
+                ]
+            }
+        },
+        "Capricorn": {
+            "Normal": {
+                "behavior": [
+                    "Public emotional visibility",
+                    "caring leadership"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Public emotional confusion",
+                    "delayed recognition"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Public emotional pressure",
+                    "image stress"
+                ]
+            }
+        },
+        "Aquarius": {
+            "Normal": {
+                "behavior": [
+                    "Emotional fulfillment through friends and gains"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Selective friendships",
+                    "emotional detachment"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Loneliness despite networks"
+                ]
+            }
+        },
+        "Pisces": {
+            "Normal": {
+                "behavior": [
+                    "Dreamy mind",
+                    "emotional withdrawal",
+                    "escapism"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Deep subconscious activity",
+                    "vivid dreams"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Emotional exhaustion",
+                    "sleep disturbances"
+                ]
+            }
+        }
+    },
+    "Mars": {
+        "Aries": {
+            "Normal": {
+                "behavior": [
+                    "Aggressive personality",
+                    "strong physical drive"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Suppressed anger",
+                    "internalized aggression"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Ego-driven aggression",
+                    "impatience"
+                ]
+            }
+        },
+        "Taurus": {
+            "Normal": {
+                "behavior": [
+                    "Harsh speech",
+                    "forceful wealth pursuits"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Speech-related conflicts",
+                    "delayed wealth action"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Verbal fights",
+                    "financial impulsiveness"
+                ]
+            }
+        },
+        "Gemini": {
+            "Normal": {
+                "behavior": [
+                    "Fearless action",
+                    "competitive communication"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Hesitant courage",
+                    "delayed initiatives"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Reckless communication",
+                    "burnout"
+                ]
+            }
+        },
+        "Cancer": {
+            "Normal": {
+                "behavior": [
+                    "Protective aggression",
+                    "domestic conflicts"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Inner domestic tension",
+                    "passive aggression"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Domestic conflicts",
+                    "loss of peace"
+                ]
+            }
+        },
+        "Leo": {
+            "Normal": {
+                "behavior": [
+                    "Passionate creativity",
+                    "competitive intelligence"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed romance",
+                    "internal passion"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Impulsive romance",
+                    "creative burnout"
+                ]
+            }
+        },
+        "Virgo": {
+            "Normal": {
+                "behavior": [
+                    "Warrior in conflicts",
+                    "strong problem-solving"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Repressed conflict",
+                    "sudden outbursts"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Overwork",
+                    "conflict escalation"
+                ]
+            }
+        },
+        "Libra": {
+            "Normal": {
+                "behavior": [
+                    "Power struggles in relationships"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed marriage conflicts",
+                    "karmic partners"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Relationship volatility",
+                    "dominance issues"
+                ]
+            }
+        },
+        "Scorpio": {
+            "Normal": {
+                "behavior": [
+                    "Strategic force",
+                    "transformative energy"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Deep internal power struggles"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Self-destructive impulses",
+                    "hidden rage"
+                ]
+            }
+        },
+        "Sagittarius": {
+            "Normal": {
+                "behavior": [
+                    "Righteous action",
+                    "crusader mentality"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Questioning beliefs before action"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Fanatic beliefs",
+                    "reckless actions"
+                ]
+            }
+        },
+        "Capricorn": {
+            "Normal": {
+                "behavior": [
+                    "Executive power",
+                    "leadership through action"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed career rise",
+                    "internal ambition"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Authority clashes",
+                    "career stress"
+                ]
+            }
+        },
+        "Aquarius": {
+            "Normal": {
+                "behavior": [
+                    "Aggressive ambition",
+                    "goal-driven energy"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Frustrated goals",
+                    "erratic drive"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Ego fights in networks"
+                ]
+            }
+        },
+        "Pisces": {
+            "Normal": {
+                "behavior": [
+                    "Hidden anger",
+                    "energy loss or foreign action"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Hidden anger",
+                    "subconscious conflict"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Energy drain",
+                    "isolation conflicts"
+                ]
+            }
+        }
+    },
+    "Rahu": {
+        "Aries": {
+            "Normal": {
+                "behavior": [
+                    "Obsessive self-focus",
+                    "unconventional identity"
+                ]
+            }
+        },
+        "Taurus": {
+            "Normal": {
+                "behavior": [
+                    "Greed for wealth",
+                    "manipulative speech"
+                ]
+            }
+        },
+        "Gemini": {
+            "Normal": {
+                "behavior": [
+                    "Media mastery",
+                    "bold self-promotion"
+                ]
+            }
+        },
+        "Cancer": {
+            "Normal": {
+                "behavior": [
+                    "Unstable home life",
+                    "foreign residence"
+                ]
+            }
+        },
+        "Leo": {
+            "Normal": {
+                "behavior": [
+                    "Obsession with fame",
+                    "risky creativity"
+                ]
+            }
+        },
+        "Virgo": {
+            "Normal": {
+                "behavior": [
+                    "Victory over enemies",
+                    "toxic competition"
+                ]
+            }
+        },
+        "Libra": {
+            "Normal": {
+                "behavior": [
+                    "Unconventional relationships",
+                    "obsession with partners"
+                ]
+            }
+        },
+        "Scorpio": {
+            "Normal": {
+                "behavior": [
+                    "Dark curiosity",
+                    "psychic turbulence"
+                ]
+            }
+        },
+        "Sagittarius": {
+            "Normal": {
+                "behavior": [
+                    "Radical beliefs",
+                    "unorthodox spirituality"
+                ]
+            }
+        },
+        "Capricorn": {
+            "Normal": {
+                "behavior": [
+                    "Extreme ambition",
+                    "political or corporate rise"
+                ]
+            }
+        },
+        "Aquarius": {
+            "Normal": {
+                "behavior": [
+                    "Mass influence",
+                    "powerful networks"
+                ]
+            }
+        },
+        "Pisces": {
+            "Normal": {
+                "behavior": [
+                    "Foreign fixation",
+                    "escapism",
+                    "illusion"
+                ]
+            }
+        }
+    },
+    "Ketu": {
+        "Aries": {
+            "Normal": {
+                "behavior": [
+                    "Detached identity",
+                    "spiritual self-image"
+                ]
+            }
+        },
+        "Taurus": {
+            "Normal": {
+                "behavior": [
+                    "Disinterest in wealth",
+                    "speech detachment"
+                ]
+            }
+        },
+        "Gemini": {
+            "Normal": {
+                "behavior": [
+                    "Silent courage",
+                    "inward communication"
+                ]
+            }
+        },
+        "Cancer": {
+            "Normal": {
+                "behavior": [
+                    "Detachment from home/mother"
+                ]
+            }
+        },
+        "Leo": {
+            "Normal": {
+                "behavior": [
+                    "Past-life creativity",
+                    "emotional distance"
+                ]
+            }
+        },
+        "Virgo": {
+            "Normal": {
+                "behavior": [
+                    "Natural healer",
+                    "quiet service"
+                ]
+            }
+        },
+        "Libra": {
+            "Normal": {
+                "behavior": [
+                    "Detachment from marriage",
+                    "karmic partners"
+                ]
+            }
+        },
+        "Scorpio": {
+            "Normal": {
+                "behavior": [
+                    "Fearless transformation",
+                    "occult mastery"
+                ]
+            }
+        },
+        "Sagittarius": {
+            "Normal": {
+                "behavior": [
+                    "Pure spiritual seeking",
+                    "wisdom"
+                ]
+            }
+        },
+        "Capricorn": {
+            "Normal": {
+                "behavior": [
+                    "Disinterest in status",
+                    "karmic career"
+                ]
+            }
+        },
+        "Aquarius": {
+            "Normal": {
+                "behavior": [
+                    "Selective associations",
+                    "solitude"
+                ]
+            }
+        },
+        "Pisces": {
+            "Normal": {
+                "behavior": [
+                    "Liberation focus",
+                    "moksha orientation"
+                ]
+            }
+        }
+    },
+    "planet": {
+        "house": {
+            "planet_state": {
+                "behavior": [
+                    "behavior"
+                ]
+            }
+        }
+    },
+    "Mercury": {
+        "Aries": {
+            "Normal": {
+                "behavior": [
+                    "Sharp intellect",
+                    "communicative personality",
+                    "quick learning"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Overthinking identity",
+                    "delayed self-expression"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Nervous personality",
+                    "lack of clarity"
+                ]
+            }
+        },
+        "Taurus": {
+            "Normal": {
+                "behavior": [
+                    "Business-minded speech",
+                    "financial intelligence"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Speech issues",
+                    "financial miscalculations"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Harsh or unclear speech",
+                    "financial mistakes"
+                ]
+            }
+        },
+        "Gemini": {
+            "Normal": {
+                "behavior": [
+                    "Skilled communication",
+                    "writing",
+                    "media talent"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Communication delays",
+                    "message confusion"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Communication burnout",
+                    "anxiety"
+                ]
+            }
+        },
+        "Cancer": {
+            "Normal": {
+                "behavior": [
+                    "Intellectual home environment",
+                    "logical emotional processing"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Mental unrest at home",
+                    "rethinking roots"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Mental peace disturbed",
+                    "domestic stress"
+                ]
+            }
+        },
+        "Leo": {
+            "Normal": {
+                "behavior": [
+                    "Analytical creativity",
+                    "intelligent children",
+                    "education focus"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Learning delays",
+                    "creative blocks"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Poor concentration",
+                    "creative frustration"
+                ]
+            }
+        },
+        "Virgo": {
+            "Normal": {
+                "behavior": [
+                    "Problem-solving mind",
+                    "service and analytical work"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Workplace misunderstandings",
+                    "nervous stress"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Work stress",
+                    "over-analysis"
+                ]
+            }
+        },
+        "Libra": {
+            "Normal": {
+                "behavior": [
+                    "Negotiation skills",
+                    "business partnerships"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Business disputes",
+                    "partnership miscommunication"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Contract issues",
+                    "relationship misunderstandings"
+                ]
+            }
+        },
+        "Scorpio": {
+            "Normal": {
+                "behavior": [
+                    "Research-oriented mind",
+                    "occult or investigative intellect"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Obsessive thinking",
+                    "hidden anxiety"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Mental instability",
+                    "fear-based thinking"
+                ]
+            }
+        },
+        "Sagittarius": {
+            "Normal": {
+                "behavior": [
+                    "Philosophical thinking",
+                    "teaching and learning focus"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Belief confusion",
+                    "re-evaluating philosophy"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Dogmatic confusion",
+                    "weak guidance"
+                ]
+            }
+        },
+        "Capricorn": {
+            "Normal": {
+                "behavior": [
+                    "Strategic career thinking",
+                    "management skills"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Career delays",
+                    "planning revisions"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Career misjudgments",
+                    "public speaking fear"
+                ]
+            }
+        },
+        "Aquarius": {
+            "Normal": {
+                "behavior": [
+                    "Networking intelligence",
+                    "gains through communication"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Friendship misunderstandings",
+                    "delayed gains"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Network conflicts",
+                    "misaligned goals"
+                ]
+            }
+        },
+        "Pisces": {
+            "Normal": {
+                "behavior": [
+                    "Abstract thinking",
+                    "isolated or foreign intellect"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Mental isolation",
+                    "subconscious overactivity"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Sleep issues",
+                    "mental exhaustion"
+                ]
+            }
+        }
+    },
+    "Jupiter": {
+        "Aries": {
+            "Normal": {
+                "behavior": [
+                    "Wise personality",
+                    "moral leadership"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Inner guru development",
+                    "delayed confidence"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Weak confidence",
+                    "poor guidance"
+                ]
+            }
+        },
+        "Taurus": {
+            "Normal": {
+                "behavior": [
+                    "Wealth through ethics",
+                    "generous speech"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed wealth growth",
+                    "value reassessment"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Financial misjudgment",
+                    "value confusion"
+                ]
+            }
+        },
+        "Gemini": {
+            "Normal": {
+                "behavior": [
+                    "Teaching through communication",
+                    "motivational speaker"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Hesitant teaching",
+                    "belief refinement"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "False motivation",
+                    "weak teaching"
+                ]
+            }
+        },
+        "Cancer": {
+            "Normal": {
+                "behavior": [
+                    "Protective wisdom",
+                    "nurturing guidance"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Detached guidance",
+                    "delayed domestic peace"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Lack of inner wisdom",
+                    "home dissatisfaction"
+                ]
+            }
+        },
+        "Leo": {
+            "Normal": {
+                "behavior": [
+                    "Intelligent children",
+                    "teaching creativity"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed children or education benefits"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Education struggles",
+                    "poor judgment"
+                ]
+            }
+        },
+        "Virgo": {
+            "Normal": {
+                "behavior": [
+                    "Ethical service",
+                    "advisor in conflicts"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Ethical struggles at work"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Ethical compromise",
+                    "service burnout"
+                ]
+            }
+        },
+        "Libra": {
+            "Normal": {
+                "behavior": [
+                    "Wise spouse",
+                    "moral partnerships"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed marriage wisdom",
+                    "karmic spouse"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Marriage issues",
+                    "moral confusion"
+                ]
+            }
+        },
+        "Scorpio": {
+            "Normal": {
+                "behavior": [
+                    "Occult wisdom",
+                    "healing knowledge"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Deep karmic healing",
+                    "hidden wisdom"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Misuse of occult knowledge"
+                ]
+            }
+        },
+        "Sagittarius": {
+            "Normal": {
+                "behavior": [
+                    "Strong dharma",
+                    "teacher",
+                    "guru energy"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Questioning religion",
+                    "internal faith"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Loss of faith",
+                    "dogmatic confusion"
+                ]
+            }
+        },
+        "Capricorn": {
+            "Normal": {
+                "behavior": [
+                    "Respected authority",
+                    "ethical career growth"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed career growth",
+                    "internal ethics"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Reputation damage",
+                    "leadership flaws"
+                ]
+            }
+        },
+        "Aquarius": {
+            "Normal": {
+                "behavior": [
+                    "Gains through teaching",
+                    "influential networks"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Selective gains",
+                    "reduced social expansion"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "False friends",
+                    "misguided gains"
+                ]
+            }
+        },
+        "Pisces": {
+            "Normal": {
+                "behavior": [
+                    "Spiritual wisdom",
+                    "charity",
+                    "liberation focus"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Strong inward spirituality",
+                    "isolation"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Spiritual delusion",
+                    "escapism"
+                ]
+            }
+        }
+    },
+    "Venus": {
+        "Aries": {
+            "Normal": {
+                "behavior": [
+                    "Charming personality",
+                    "artistic appearance"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Self-worth issues",
+                    "redefined beauty"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Low self-esteem",
+                    "charm suppressed"
+                ]
+            }
+        },
+        "Taurus": {
+            "Normal": {
+                "behavior": [
+                    "Luxury",
+                    "sweet speech",
+                    "wealth attraction"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Financial reassessment",
+                    "speech restraint"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Money loss",
+                    "relationship insecurity"
+                ]
+            }
+        },
+        "Gemini": {
+            "Normal": {
+                "behavior": [
+                    "Creative communication",
+                    "artistic skills"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Creative block",
+                    "past artistic themes"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Creative burnout",
+                    "social anxiety"
+                ]
+            }
+        },
+        "Cancer": {
+            "Normal": {
+                "behavior": [
+                    "Beautiful home",
+                    "emotional comfort"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Emotional dissatisfaction at home"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Lack of emotional comfort"
+                ]
+            }
+        },
+        "Leo": {
+            "Normal": {
+                "behavior": [
+                    "Romance",
+                    "creativity",
+                    "pleasure"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed romance",
+                    "past lovers return"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Romantic disappointment"
+                ]
+            }
+        },
+        "Virgo": {
+            "Normal": {
+                "behavior": [
+                    "Service through arts",
+                    "relationship conflicts"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Workplace relationship strain"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Relationship stress at work"
+                ]
+            }
+        },
+        "Libra": {
+            "Normal": {
+                "behavior": [
+                    "Strong love life",
+                    "harmonious marriage"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Marriage delays",
+                    "karmic relationships"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Marriage conflicts",
+                    "lack of affection"
+                ]
+            }
+        },
+        "Scorpio": {
+            "Normal": {
+                "behavior": [
+                    "Intense intimacy",
+                    "transformative love"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Obsessive love patterns"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Intimacy issues",
+                    "jealousy"
+                ]
+            }
+        },
+        "Sagittarius": {
+            "Normal": {
+                "behavior": [
+                    "Romantic ideals",
+                    "artistic beliefs"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Questioning romantic ideals"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Disillusionment in love beliefs"
+                ]
+            }
+        },
+        "Capricorn": {
+            "Normal": {
+                "behavior": [
+                    "Artistic career",
+                    "public charm"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Career dissatisfaction",
+                    "delayed recognition"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Public image damage"
+                ]
+            }
+        },
+        "Aquarius": {
+            "Normal": {
+                "behavior": [
+                    "Gains through relationships",
+                    "social success"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Selective friendships",
+                    "reduced gains"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Social dissatisfaction"
+                ]
+            }
+        },
+        "Pisces": {
+            "Normal": {
+                "behavior": [
+                    "Luxury expenses",
+                    "foreign romance"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Escapist romance",
+                    "emotional withdrawal"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Pleasure loss",
+                    "isolation"
+                ]
+            }
+        }
+    },
+    "Saturn": {
+        "Aries": {
+            "Normal": {
+                "behavior": [
+                    "Serious personality",
+                    "disciplined identity"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Identity burden",
+                    "delayed self-confidence"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Severe self-doubt",
+                    "blocked discipline"
+                ]
+            }
+        },
+        "Taurus": {
+            "Normal": {
+                "behavior": [
+                    "Slow wealth accumulation",
+                    "disciplined speech"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Financial delays",
+                    "value reassessment"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Financial fear",
+                    "speech inhibition"
+                ]
+            }
+        },
+        "Gemini": {
+            "Normal": {
+                "behavior": [
+                    "Structured communication",
+                    "hard effort"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Fear of expression",
+                    "effort frustration"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Mental pressure",
+                    "effort burnout"
+                ]
+            }
+        },
+        "Cancer": {
+            "Normal": {
+                "behavior": [
+                    "Emotional restriction",
+                    "responsibility at home"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Emotional coldness",
+                    "inner loneliness"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Emotional heaviness",
+                    "home stress"
+                ]
+            }
+        },
+        "Leo": {
+            "Normal": {
+                "behavior": [
+                    "Delayed creativity",
+                    "serious intellect"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Delayed children",
+                    "creative suppression"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Joy suppression",
+                    "creative depression"
+                ]
+            }
+        },
+        "Virgo": {
+            "Normal": {
+                "behavior": [
+                    "Strong work ethic",
+                    "endurance"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Work stress",
+                    "internal pressure"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Chronic stress",
+                    "overwork"
+                ]
+            }
+        },
+        "Libra": {
+            "Normal": {
+                "behavior": [
+                    "Delayed marriage",
+                    "duty-bound relationships"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Marriage karma",
+                    "relationship delays"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Cold relationships",
+                    "separation tendencies"
+                ]
+            }
+        },
+        "Scorpio": {
+            "Normal": {
+                "behavior": [
+                    "Fearless endurance",
+                    "karmic transformations"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Deep karmic fear processing"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Fear dominance",
+                    "internal collapse"
+                ]
+            }
+        },
+        "Sagittarius": {
+            "Normal": {
+                "behavior": [
+                    "Rigid beliefs",
+                    "disciplined philosophy"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Belief restructuring",
+                    "inner discipline"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Loss of guiding principles"
+                ]
+            }
+        },
+        "Capricorn": {
+            "Normal": {
+                "behavior": [
+                    "High achievement",
+                    "authority through effort"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Late career success",
+                    "authority struggles"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Career blockage",
+                    "authority fear"
+                ]
+            }
+        },
+        "Aquarius": {
+            "Normal": {
+                "behavior": [
+                    "Slow gains",
+                    "long-term success"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Limited networks",
+                    "delayed gains"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Social isolation"
+                ]
+            }
+        },
+        "Pisces": {
+            "Normal": {
+                "behavior": [
+                    "Isolation",
+                    "disciplined spirituality"
+                ]
+            },
+            "Retrograde": {
+                "behavior": [
+                    "Extreme isolation",
+                    "intense spiritual discipline"
+                ]
+            },
+            "Combust": {
+                "behavior": [
+                    "Extreme withdrawal",
+                    "exhaustion"
+                ]
+            }
+        }
+    }
+}

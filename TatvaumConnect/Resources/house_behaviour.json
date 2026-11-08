@@ -1,0 +1,345 @@
+{
+    "1": {
+        "House Name": "Lagna / Ascendant",
+        "Representation": [
+            "Self",
+            "body",
+            "identity",
+            "life path"
+        ],
+        "Behavior": [
+            "Personality",
+            "instinctive behavior",
+            "self-image",
+            "vitality",
+            "how one initiates life"
+        ],
+        "Strengths": [
+            "Confidence",
+            "leadership",
+            "presence"
+        ],
+        "Challenges": [
+            "Ego",
+            "self-centeredness",
+            "impulsiveness"
+        ],
+        "Life Areas": [
+            "Health",
+            "appearance",
+            "attitude"
+        ]
+    },
+    "2": {
+        "House Name": "Dhana Bhava",
+        "Representation": [
+            "Wealth",
+            "speech",
+            "family values"
+        ],
+        "Behavior": [
+            "Value-driven",
+            "security-seeking",
+            "speech patterns",
+            "food habits"
+        ],
+        "Strengths": [
+            "Financial sense",
+            "stability",
+            "resource management"
+        ],
+        "Challenges": [
+            "Attachment",
+            "greed",
+            "harsh speech"
+        ],
+        "Life Areas": [
+            "Money",
+            "family",
+            "voice",
+            "savings"
+        ]
+    },
+    "3": {
+        "House Name": "Sahaja Bhava",
+        "Representation": [
+            "Courage",
+            "effort",
+            "siblings",
+            "communication"
+        ],
+        "Behavior": [
+            "Initiative",
+            "risk-taking",
+            "communication style",
+            "skills"
+        ],
+        "Strengths": [
+            "Bravery",
+            "persistence",
+            "learning"
+        ],
+        "Challenges": [
+            "Restlessness",
+            "aggression",
+            "rivalry"
+        ],
+        "Life Areas": [
+            "Siblings",
+            "writing",
+            "media",
+            "travel"
+        ]
+    },
+    "4": {
+        "House Name": "Sukha Bhava",
+        "Representation": [
+            "Home",
+            "mother",
+            "emotions",
+            "inner peace"
+        ],
+        "Behavior": [
+            "Emotional security needs",
+            "nurturing style",
+            "attachment to roots"
+        ],
+        "Strengths": [
+            "Empathy",
+            "care",
+            "emotional depth"
+        ],
+        "Challenges": [
+            "Mood swings",
+            "dependency",
+            "nostalgia"
+        ],
+        "Life Areas": [
+            "Home",
+            "property",
+            "vehicles",
+            "education"
+        ]
+    },
+    "5": {
+        "House Name": "Putra Bhava",
+        "Representation": [
+            "Creativity",
+            "intelligence",
+            "romance",
+            "children"
+        ],
+        "Behavior": [
+            "Self-expression",
+            "love style",
+            "risk appetite",
+            "intelligence"
+        ],
+        "Strengths": [
+            "Creativity",
+            "charisma",
+            "intuition"
+        ],
+        "Challenges": [
+            "Ego in love",
+            "speculation losses"
+        ],
+        "Life Areas": [
+            "Romance",
+            "arts",
+            "speculation",
+            "mantra"
+        ]
+    },
+    "6": {
+        "House Name": "Shatru Bhava",
+        "Representation": [
+            "Service",
+            "enemies",
+            "health",
+            "discipline"
+        ],
+        "Behavior": [
+            "Problem-solving",
+            "work ethic",
+            "competitiveness"
+        ],
+        "Strengths": [
+            "Resilience",
+            "discipline",
+            "service mindset"
+        ],
+        "Challenges": [
+            "Stress",
+            "conflicts",
+            "chronic issues"
+        ],
+        "Life Areas": [
+            "Job",
+            "health",
+            "debts",
+            "litigation"
+        ]
+    },
+    "7": {
+        "House Name": "Yuvati Bhava",
+        "Representation": [
+            "Marriage",
+            "partnerships",
+            "public dealings"
+        ],
+        "Behavior": [
+            "Relationship patterns",
+            "cooperation",
+            "projection of self"
+        ],
+        "Strengths": [
+            "Diplomacy",
+            "business sense"
+        ],
+        "Challenges": [
+            "Dependency",
+            "conflicts in partnership"
+        ],
+        "Life Areas": [
+            "Spouse",
+            "business partners",
+            "contracts"
+        ]
+    },
+    "8": {
+        "House Name": "Randhra Bhava",
+        "Representation": [
+            "Transformation",
+            "secrets",
+            "longevity"
+        ],
+        "Behavior": [
+            "Intensity",
+            "crisis-handling",
+            "occult curiosity"
+        ],
+        "Strengths": [
+            "Research depth",
+            "resilience"
+        ],
+        "Challenges": [
+            "Fear",
+            "secrecy",
+            "sudden upheavals"
+        ],
+        "Life Areas": [
+            "Inheritance",
+            "occult",
+            "surgery",
+            "trauma"
+        ]
+    },
+    "9": {
+        "House Name": "Dharma Bhava",
+        "Representation": [
+            "Fortune",
+            "beliefs",
+            "higher wisdom"
+        ],
+        "Behavior": [
+            "Faith system",
+            "ethics",
+            "learning from mentors"
+        ],
+        "Strengths": [
+            "Optimism",
+            "guidance",
+            "wisdom"
+        ],
+        "Challenges": [
+            "Dogmatism",
+            "arrogance"
+        ],
+        "Life Areas": [
+            "Luck",
+            "teachers",
+            "long travel"
+        ]
+    },
+    "10": {
+        "House Name": "Karma Bhava",
+        "Representation": [
+            "Career",
+            "status",
+            "public life"
+        ],
+        "Behavior": [
+            "Work identity",
+            "ambition",
+            "authority handling"
+        ],
+        "Strengths": [
+            "Leadership",
+            "discipline",
+            "reputation"
+        ],
+        "Challenges": [
+            "Workaholism",
+            "pressure"
+        ],
+        "Life Areas": [
+            "Career",
+            "fame",
+            "government"
+        ]
+    },
+    "11": {
+        "House Name": "Labha Bhava",
+        "Representation": [
+            "Gains",
+            "networks",
+            "ambitions"
+        ],
+        "Behavior": [
+            "Goal orientation",
+            "social circles",
+            "income mindset"
+        ],
+        "Strengths": [
+            "Networking",
+            "strategic thinking"
+        ],
+        "Challenges": [
+            "Over-ambition",
+            "greed"
+        ],
+        "Life Areas": [
+            "Income",
+            "friends",
+            "aspirations"
+        ]
+    },
+    "12": {
+        "House Name": "Vyaya Bhava",
+        "Representation": [
+            "Loss",
+            "liberation",
+            "subconscious"
+        ],
+        "Behavior": [
+            "Detachment",
+            "escapism",
+            "spiritual retreat"
+        ],
+        "Strengths": [
+            "Spiritual growth",
+            "compassion"
+        ],
+        "Challenges": [
+            "Isolation",
+            "expenses",
+            "confusion"
+        ],
+        "Life Areas": [
+            "Foreign lands",
+            "sleep",
+            "moksha"
+        ]
+    }
+}
