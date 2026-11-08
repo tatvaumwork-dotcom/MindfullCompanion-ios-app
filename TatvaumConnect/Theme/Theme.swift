@@ -34,42 +34,6 @@ enum Cosmic {
     static let error = Color(argb: 0xFFFF6B8A)
     static let surfaceVariant = Color(argb: 0xFF161931)
 
-    static let goldGradient = LinearGradient(colors: [gold, amber], startPoint: .leading, endPoint: .trailing)
-}
-
-/// Full-screen deep-space backdrop with soft nebula glows.
-struct CosmicBackground<Content: View>: View {
-    @ViewBuilder var content: Content
-    var body: some View {
-        ZStack {
-            Cosmic.spaceBg.ignoresSafeArea()
-            RadialGradient(colors: [Color(argb: 0x38503C96), .clear], center: .topLeading, startRadius: 0, endRadius: 420)
-                .ignoresSafeArea()
-            RadialGradient(colors: [Color(argb: 0x26F5C66B), .clear], center: .bottomTrailing, startRadius: 0, endRadius: 380)
-                .ignoresSafeArea()
-            content
-        }
-    }
-}
-
-/// Translucent rounded card used across screens.
-struct Panel: ViewModifier {
-    var padding: CGFloat = 16
-    func body(content: Content) -> some View {
-        content.padding(padding)
-            .background(Cosmic.panel, in: RoundedRectangle(cornerRadius: 18))
-            .overlay(RoundedRectangle(cornerRadius: 18).stroke(Cosmic.panelBorder))
-    }
-}
-extension View { func panel(_ padding: CGFloat = 16) -> some View { modifier(Panel(padding: padding)) } }
-
-struct GoldButtonStyle: ButtonStyle {
-    @Environment(\.isEnabled) private var enabled
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.headline).foregroundStyle(Cosmic.onGold)
-            .frame(maxWidth: .infinity).padding(.vertical, 14)
-            .background(Cosmic.goldGradient, in: Capsule())
-            .opacity(enabled ? (configuration.isPressed ? 0.8 : 1) : 0.4)
-    }
+    static let goldGradient = LinearGradient(colors: [gold, amber], startPoint: .topLeading, endPoint: .bottomTrailing)
+    static let body = Color(argb: 0xFFD6D9F5)
 }
