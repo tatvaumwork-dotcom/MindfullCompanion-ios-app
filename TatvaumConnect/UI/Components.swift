@@ -12,7 +12,7 @@ struct CosmicBackground<Content: View>: View {
     @ViewBuilder var content: Content
     var body: some View {
         ZStack {
-            Cosmic.spaceBg
+            Cosmic.spaceBg.ignoresSafeArea()
             TimelineView(.animation(minimumInterval: 1 / 20)) { tl in
                 Canvas { ctx, size in
                     let w = size.width, h = size.height
@@ -32,9 +32,9 @@ struct CosmicBackground<Content: View>: View {
                     }
                 }
             }
+            .ignoresSafeArea()
             content
         }
-        .ignoresSafeArea()
     }
 }
 
