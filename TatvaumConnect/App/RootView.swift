@@ -6,7 +6,7 @@ struct RootView: View {
     var body: some View {
         CosmicBackground {
             if c.profileStore.profile.isOnboarded { MainTabs(c: c) }
-            else { OnboardingView(profileStore: c.profileStore, pincodes: c.pincodes, cities: c.cities) }
+            else { OnboardingView(profileStore: c.profileStore, pincodes: c.pincodes, cities: c.cities).frame(maxWidth: 640) }  // readable width on iPad
         }
     }
 }
