@@ -8,6 +8,8 @@ struct RootView: View {
             if c.profileStore.profile.isOnboarded { MainTabs(c: c) }
             else { OnboardingView(profileStore: c.profileStore, pincodes: c.pincodes, cities: c.cities).frame(maxWidth: 640) }  // readable width on iPad
         }
+        .scrollDismissesKeyboard(.interactively)
+        .onAppear { KeyboardDismisser.shared.install() }
     }
 }
 
