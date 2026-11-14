@@ -14,6 +14,9 @@ struct SettingsView: View {
             ScrollView {
                 VStack(spacing: 22) {
                     ProfilesSection(profiles: profiles, onAdd: onAddProfile)
+                    TraitsSection(profileStore: profileStore, isMe: profiles.active.id == profiles.primaryId)
+                        .id(profiles.active.id)
+                        .transition(.opacity)
                     SectionCard(title: "About the AI") {
                         HStack(alignment: .top, spacing: 12) {
                             Image(systemName: "sparkles").foregroundStyle(Cosmic.gold)
@@ -34,6 +37,7 @@ struct SettingsView: View {
                 }.padding(.horizontal, 16).padding(.top, 4).padding(.bottom, 24)
             }
             .background(CosmicBackground { EmptyView() })
+            .animation(.snappy, value: profiles.active.id)
             .navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(action: onBack) { Image(systemName: "chevron.left") }.accessibilityLabel("Back") } }
@@ -131,5 +135,34 @@ private struct ProfileRow: View {
         .padding(.horizontal, 10).padding(.vertical, 10)
         .background(selected ? Color(argb: 0x14F5C66B) : .clear, in: RoundedRectangle(cornerRadius: 14))
         .buttonStyle(.plain)
+    }
+}
+
+/// The selected person's traits: what their chart suggests, and what their chats have shown.
+private struct TraitsSection: View {
+    let profileStore: ProfileStore
+    let isMe: Bool
+
+    var body: some View {
+        let p = profileStore.profile
+        let name = p.displayName.isEmpty ? "Their" : "\(p.displayName)’s"
+        let fromChart = Array(p.predictedTraits.prefix(8))
+        let fromChats = p.traits.sorted { $0.observedCount > $1.observedCount }.map(\.text)
+        SectionCard(title: isMe ? "Your traits" : "\(name) traits") {
+            if !fromChart.isEmpty {
+                FieldLabel("FROM \(isMe ? "YOUR" : "THEIR") CHART")
+                ChipFlow(items: fromChart, accent: true)
+            }
+            if !fromChart.isEmpty && !fromChats.isEmpty { Divider().overlay(Cosmic.panelBorder) }
+            if !fromChats.isEmpty {
+                FieldLabel("FROM \(isMe ? "YOUR" : "THEIR") CHATS")
+                ChipFlow(items: fromChats)
+            }
+            if fromChart.isEmpty && fromChats.isEmpty {
+                Text(profileStore.isGeneratingPredictions ? "Reading the stars…"
+                     : "Traits appear here once the chart has been read and as \(isMe ? "you chat" : "they chat").")
+                    .font(.system(size: 13)).foregroundStyle(Cosmic.muted)
+            }
+        }
     }
 }
