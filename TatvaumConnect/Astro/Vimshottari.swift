@@ -68,6 +68,11 @@ enum Vimshottari {
         }
     }
 
+    /// The nine sub-periods of `p` (precomputed ones when present, otherwise computed now).
+    static func subdivide(_ p: Period) -> [Period] {
+        p.sub.isEmpty ? subPeriods(parent: p.lord, start: p.startMillis, end: p.endMillis, depth: 1) : p.sub
+    }
+
     static func current(timeline: [Period], at: Int64) -> Current? {
         guard let maha = timeline.first(where: { $0.contains(t: at) }),
               let antar = maha.sub.first(where: { $0.contains(t: at) }),

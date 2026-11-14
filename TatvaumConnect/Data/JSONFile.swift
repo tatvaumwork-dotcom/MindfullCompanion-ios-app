@@ -6,8 +6,9 @@ struct JSONFile<T: Codable> {
     let url: URL
     private static var log: Logger { Logger(subsystem: "com.tatvaum.connect", category: "JSONFile") }
 
-    init(_ name: String) {
-        url = URL.documentsDirectory.appending(path: name)
+    /// `name` inside `directory` (the app's Documents folder by default).
+    init(_ name: String, in directory: URL = .documentsDirectory) {
+        url = directory.appending(path: name)
     }
 
     func read() -> T? {

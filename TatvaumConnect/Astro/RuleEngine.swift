@@ -44,8 +44,7 @@ final class RuleEngine: @unchecked Sendable {  // immutable after init
 
     init(bundle: Bundle = .main) {
         func load(_ name: String) -> [String: Any] {
-            guard let url = bundle.url(forResource: name, withExtension: "json"),
-                  let data = try? Data(contentsOf: url),
+            guard let data = AstroData.data(name, bundle: bundle),
                   let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [:] }
             return obj
         }

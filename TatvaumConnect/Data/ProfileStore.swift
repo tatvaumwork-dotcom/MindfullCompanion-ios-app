@@ -10,11 +10,13 @@ final class ProfileStore {
     private(set) var profile: UserProfile
     private(set) var isGeneratingPredictions = false
 
-    @ObservationIgnored private let file = JSONFile<UserProfile>("profile.json")
+    @ObservationIgnored private let file: JSONFile<UserProfile>
     @ObservationIgnored private let llm: LLMService
     @ObservationIgnored private let ruleEngine: RuleEngine
 
-    init(llm: LLMService, ruleEngine: RuleEngine) {
+    /// `dir` is this profile's folder (Documents/profiles/<id>/).
+    init(dir: URL, llm: LLMService, ruleEngine: RuleEngine) {
+        file = JSONFile("profile.json", in: dir)
         self.llm = llm
         self.ruleEngine = ruleEngine
         profile = file.read() ?? UserProfile()

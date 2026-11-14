@@ -10,19 +10,29 @@ private enum TraitSheet: Identifiable {
 
 /// Chart-derived data, computed off the main thread once per set of birth details.
 private struct Derived {
+    var birthMillis: Int64?
+    var planets: [PlanetPosition] = []
+    var ascendant: Ascendant?
     var cosmic: CosmicProfile?
     var dasha: [Vimshottari.Period]?
+    /// The shareable profile card, rendered once the chart is known.
+    var card: UIImage?
 
     static func compute(_ p: UserProfile) async -> Derived {
         guard let dob = p.dateOfBirth, let tob = p.timeOfBirth,
               let ms = ProfileStore.birthMillis(dob, tob, p.birthTimezone) else { return Derived() }
-        let lat = p.birthPlaceLatitude, lon = p.birthPlaceLongitude
+        let lat = p.birthPlaceLatitude, lon = p.birthPlaceLongitude, place = p.placeOfBirth
         return await Task.detached {
             let planets = PlanetPositionCalculator.calculatePlanetPositions(epochMillis: ms)
             let moon = planets.first { $0.planet == .Moon }!
-            var d = Derived(dasha: Vimshottari.timeline(birthMillis: ms, moonSiderealLongitude: moon.siderealLongitude))
+            var d = Derived(birthMillis: ms, planets: planets,
+                            dasha: Vimshottari.timeline(birthMillis: ms, moonSiderealLongitude: moon.siderealLongitude))
             if let lat, let lon {
-                d.cosmic = CosmicProfile.build(planets: planets, ascendantLongitude: PlanetPositionCalculator.calculateAscendant(epochMillis: ms, latitude: lat, longitude: lon).longitude)
+                let asc = PlanetPositionCalculator.calculateAscendant(epochMillis: ms, latitude: lat, longitude: lon)
+                let cosmic = CosmicProfile.build(planets: planets, ascendantLongitude: asc.longitude)
+                d.ascendant = asc
+                d.cosmic = cosmic
+                d.card = ShareCard.render(cosmic, planets: planets, ascendantLongitude: asc.longitude, birthMillis: ms, place: place)
             }
             return d
         }.value
@@ -42,6 +52,8 @@ struct ProfileView: View {
     @State private var traitSheet: TraitSheet?
     @State private var showChart = false
     @State private var openSessionId: String?
+    @State private var tab = ProfileTab.overall
+    @AppStorage("profile_view_mode") private var mode = ProfileMode.simple
 
     init(profileStore: ProfileStore, historyStore: HistoryStore, openSettings: @escaping () -> Void) {
         self.profileStore = profileStore; self.historyStore = historyStore; self.openSettings = openSettings
@@ -54,9 +66,22 @@ struct ProfileView: View {
                 LazyVStack(spacing: 20) {
                     header(profile)
                     if let c = derived.cosmic {
-                        CosmicProfilePanel(c: c, running: derived.dasha.flatMap { Vimshottari.current(timeline: $0, at: nowMillis()) })
+                        ViewThatFits(in: .horizontal) {
+                            HStack { tabSwitch; Spacer(minLength: 8); modeSwitch }
+                            VStack(alignment: .leading, spacing: 8) { tabSwitch; modeSwitch }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .guideTarget(.profileViews)
+                        if tab == .today, let ms = derived.birthMillis, let asc = derived.ascendant {
+                            TodayPanel(simple: mode == .simple, birthMillis: ms, planets: derived.planets, ascSign: asc.sign)
+                                .id("today-\(mode)")
+                        } else if mode == .simple {
+                            SimpleProfilePanel(c: c, birthMillis: derived.birthMillis)
+                        } else {
+                            CosmicProfilePanel(c: c, running: derived.dasha.flatMap { Vimshottari.current(timeline: $0, at: nowMillis()) })
+                            if let t = derived.dasha { DashaPanel(timeline: t) }
+                        }
                     }
-                    if let t = derived.dasha { DashaPanel(timeline: t) }
                     blueprint(profile)
                     matters(profile)
                     traits(profile)
@@ -95,6 +120,13 @@ struct ProfileView: View {
         "\(p.dateOfBirth ?? "")|\(p.timeOfBirth ?? "")|\(p.birthTimezone)|\(p.birthPlaceLatitude ?? 0)|\(p.birthPlaceLongitude ?? 0)"
     }
 
+    private var tabSwitch: some View {
+        PillSwitch(options: ProfileTab.allCases, selected: tab, label: \.rawValue) { tab = $0 }
+    }
+    private var modeSwitch: some View {
+        PillSwitch(options: ProfileMode.allCases, selected: mode, label: \.rawValue) { mode = $0 }
+    }
+
     private var addTitle: String {
         switch addingTo { case .interests: "Add interest"; case .values: "Add value"; case .goals: "Add goal"; case nil: "" }
     }
@@ -108,8 +140,16 @@ struct ProfileView: View {
                 Subtitle(p.dateOfBirth.map { "Born \($0) \(p.timeOfBirth ?? "") · \(p.birthTimezone.replacingOccurrences(of: "_", with: " "))" } ?? "A synthesis of your whole chart")
             }
             Spacer()
+            if let card = derived.card {
+                ShareLink(item: Image(uiImage: card), subject: Text("My cosmic profile"), message: Text("✦ My cosmic profile"),
+                          preview: SharePreview("My cosmic profile", image: Image(uiImage: card))) {
+                    SharePillLabel()
+                }
+                .padding(.top, 8)
+                .guideTarget(.share)
+            }
             Button(action: openSettings) { Image(systemName: "gearshape.fill").foregroundStyle(Cosmic.muted).frame(width: 44, height: 44) }
-                .accessibilityLabel("Settings")
+                .accessibilityLabel("Settings").guideTarget(.settings)
         }
     }
 

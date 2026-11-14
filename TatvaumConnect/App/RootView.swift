@@ -1,15 +1,39 @@
 import SwiftUI
 
-/// Onboarding → four tabs (Chat, Planets, 3rd Eye, Profile). Settings opens from the gear.
+/// Animated launch screen → onboarding → four tabs (Chat, Planets, 3rd Eye, Profile). Settings opens from the gear.
 struct RootView: View {
     let c: AppContainer
+    @State private var splashDone = false
+
     var body: some View {
-        CosmicBackground {
-            if c.profileStore.profile.isOnboarded { MainTabs(c: c) }
-            else { OnboardingView(profileStore: c.profileStore, pincodes: c.pincodes, cities: c.cities).frame(maxWidth: 640) }  // readable width on iPad
+        ZStack {
+            CosmicBackground {
+                if !c.profileStore.profile.isOnboarded {
+                    let adding = c.profiles.isAddingActive
+                    OnboardingView(profileStore: c.profileStore, pincodes: c.pincodes, cities: c.cities,
+                                   onCancel: adding ? { c.profiles.cancelAdding() } : nil,
+                                   onDone: {
+                                       c.profiles.finishAdding()
+                                       AppRouter.shared.requestedTab = AppRouter.profileTab
+                                   })
+                        .frame(maxWidth: 640)  // readable width on iPad
+                        .id(c.profiles.active.id)
+                } else {
+                    MainTabs(c: c)
+                }
+            }
+            if !splashDone {
+                SplashView { withAnimation(.easeOut(duration: 0.35)) { splashDone = true } }
+                    .transition(.opacity)
+                    .zIndex(1)
+            }
         }
         .scrollDismissesKeyboard(.interactively)
         .onAppear { KeyboardDismisser.shared.install() }
+        // Opened from the Third Eye widget.
+        .onOpenURL { url in
+            if url.host() == "third-eye" { AppRouter.shared.requestedTab = AppRouter.thirdEyeTab }
+        }
     }
 }
 
@@ -17,33 +41,91 @@ private struct MainTabs: View {
     let c: AppContainer
     @State private var tab = 0
     @State private var showSettings = false
-    @State private var sky: (scene: SkyScene, a: Int, b: String)?
     @State private var showSky = false
-    private let router = ThirdEyeRouter.shared
+    @State private var showConversations = false
+    @State private var openSession: ConversationSummary?
+    @State private var guideTargets = GuideTargets()
+    /// First-run tour of the tabs; shown once, replayable from Settings.
+    @State private var touring = !GuidePrefs.isDone
+    private let router = AppRouter.shared
 
     var body: some View {
-        TabView(selection: $tab) {
-            ChatView(chat: c.chat, llm: c.llm, name: c.profileStore.profile.displayName, openSettings: { showSettings = true })
-                .tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right") }.tag(0)
-            PlanetsView(profile: c.profileStore.profile, openSettings: { showSettings = true }, onOpenSky: { showSky = true })
-                .tabItem { Label("Planets", systemImage: "globe") }.tag(1)
-            ThirdEyeView(store: c.thirdEye, openSettings: { showSettings = true })
-                .tabItem { Label("3rd Eye", systemImage: "eye") }.tag(2)
-            ProfileView(profileStore: c.profileStore, historyStore: c.historyStore, openSettings: { showSettings = true })
-                .tabItem { Label("Profile", systemImage: "person") }.tag(3)
+        let id = c.profiles.active.id
+        ZStack {
+            TabView(selection: $tab) {
+                ChatView(chat: c.chat, llm: c.llm, name: c.profileStore.profile.displayName,
+                         openSettings: { showSettings = true },
+                         openConversations: { withAnimation(.snappy) { showConversations = true } })
+                    .id(id).background(TabBarProbe())
+                    .tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right") }.tag(0)
+                PlanetsView(profile: c.profileStore.profile, openSettings: { showSettings = true }, onOpenSky: { showSky = true })
+                    .id(id).background(TabBarProbe())
+                    .tabItem { Label("Planets", systemImage: "globe") }.tag(1)
+                ThirdEyeView(store: c.thirdEye, openSettings: { showSettings = true })
+                    .background(TabBarProbe())
+                    .tabItem { Label("3rd Eye", systemImage: "eye") }.tag(2)
+                ProfileView(profileStore: c.profileStore, historyStore: c.historyStore, openSettings: { showSettings = true })
+                    .id(id).background(TabBarProbe())
+                    .tabItem { Label("Profile", systemImage: "person") }.tag(3)
+            }
+            .toolbarBackground(Color(argb: 0xF00A0B1A), for: .tabBar)
+            .toolbarBackground(.visible, for: .tabBar)
+
+            if showConversations {
+                ConversationsDrawer(summaries: c.historyStore.summaries,
+                                    onClose: { withAnimation(.snappy) { showConversations = false } },
+                                    onOpen: { s in
+                                        withAnimation(.snappy) { showConversations = false }
+                                        openSession = s
+                                    })
+                    .zIndex(1)
+            }
+            if touring {
+                GuideOverlay(targets: guideTargets, onShowTab: { tab = $0 }, onFinish: endTour).zIndex(2)
+            }
         }
-        .toolbarBackground(Color(argb: 0xF00A0B1A), for: .tabBar)
-        .toolbarBackground(.visible, for: .tabBar)
+        .environment(\.guideTargets, guideTargets)
         .sheet(isPresented: $showSettings) {
-            SettingsView(profileStore: c.profileStore, onBack: { showSettings = false })
+            SettingsView(profiles: c.profiles, onBack: { showSettings = false },
+                         onAddProfile: { showSettings = false; c.profiles.addProfile() },
+                         onReplayGuide: { showSettings = false; tab = 0; touring = true })
         }
-        .fullScreenCover(isPresented: $showSky, onDismiss: { sky = nil }) { SkyCover(c: c) { showSky = false } }
-        // Opened from the weekly notification: jump straight to the 3rd Eye tab.
-        .onChange(of: router.requestedTab) { _, t in
+        .sheet(item: $openSession) { s in
+            NavigationStack {
+                SessionDetailView(summary: s)
+                    .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { openSession = nil } } }
+            }
+        }
+        .fullScreenCover(isPresented: $showSky) { SkyCover(c: c) { showSky = false } }
+        // Opened from the weekly notification or widget, or birth details just entered: jump to that tab.
+        .onChange(of: router.requestedTab, initial: true) { _, t in
             guard let t else { return }
-            tab = t; showSettings = false; showSky = false
+            tab = t; showSettings = false; showSky = false; showConversations = false
             router.requestedTab = nil
         }
+        .onChange(of: id) { showConversations = false; openSession = nil }
+    }
+
+    private func endTour() {
+        withAnimation { touring = false }
+        GuidePrefs.isDone = true
+    }
+}
+
+/// Reports where the bottom tab bar sits for the tour: everything below the tab's content.
+/// The tour clips it to the screen, and skips it where nothing is below (e.g. iPad's top tab bar).
+private struct TabBarProbe: View {
+    @Environment(\.guideTargets) private var targets
+    var body: some View {
+        GeometryReader { g in
+            Color.clear
+                .onChange(of: rect(g), initial: true) { _, r in if let r { targets?.rects[.tabBar] = r } }
+                .onDisappear { targets?.rects[.tabBar] = nil }
+        }
+    }
+    private func rect(_ g: GeometryProxy) -> CGRect? {
+        let f = g.frame(in: .global)
+        return CGRect(x: f.minX + 8, y: f.maxY, width: f.width - 16, height: 200)
     }
 }
 

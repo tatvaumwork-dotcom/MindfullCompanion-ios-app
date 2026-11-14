@@ -5,13 +5,16 @@ struct ChatView: View {
     let llm: LLMService
     let name: String
     let openSettings: () -> Void
+    let openConversations: () -> Void
 
     @State private var input = ""
     @State private var confirmEnd = false
     @FocusState private var focused: Bool
 
-    init(chat: ChatSession, llm: LLMService, name: String, openSettings: @escaping () -> Void) {
+    init(chat: ChatSession, llm: LLMService, name: String, openSettings: @escaping () -> Void,
+         openConversations: @escaping () -> Void = {}) {
         self.chat = chat; self.llm = llm; self.name = name; self.openSettings = openSettings
+        self.openConversations = openConversations
     }
 
     var body: some View {
@@ -63,8 +66,12 @@ struct ChatView: View {
         ZStack {
             (Text("✦ ").foregroundColor(Cosmic.gold) + Text("Tatvaum")).font(.system(size: 18, weight: .bold)).tracking(0.5)
                 .foregroundStyle(Cosmic.starText)
-            HStack {
-                if llm.isAvailable { statusPill }
+            HStack(spacing: 4) {
+                Button(action: openConversations) {
+                    Image(systemName: "clock.arrow.circlepath").font(.system(size: 18)).frame(width: 40, height: 40).contentShape(Rectangle())
+                }
+                .foregroundStyle(Cosmic.muted).accessibilityLabel("Past conversations").guideTarget(.pastChats)
+                if llm.isAvailable { statusPill.guideTarget(.aiStatus) }
                 Spacer()
                 if !empty && !chat.isGenerating {
                     Button("End session") { confirmEnd = true }.font(.system(size: 14, weight: .medium)).foregroundStyle(Cosmic.gold)

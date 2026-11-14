@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
 <key>GeminiAPIKey</key><string>$(GEMINI_API_KEY)</string>
-<key>UILaunchScreen</key><dict/>
+<key>UILaunchScreen</key><dict>
+	<key>UIColorName</key><string>LaunchBackground</string>
+	<key>UIImageName</key><string>LaunchLogo</string>
+	<key>UIImageRespectsSafeAreaInsets</key><false/>
+</dict>
 <key>UIUserInterfaceStyle</key><string>Dark</string>
+<key>CFBundleURLTypes</key><array><dict>
+	<key>CFBundleURLName</key><string>com.tatvaum.connect</string>
+	<key>CFBundleURLSchemes</key><array><string>tatvaum</string></array>
+</dict></array>
 </dict></plist>

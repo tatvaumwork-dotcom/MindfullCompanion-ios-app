@@ -172,5 +172,6 @@ final class ThirdEyeStore {
     private func save() {
         let snapshot = entries, file = file
         writerQueue.async { file.write(snapshot) }
+        ThirdEyeWidgetBridge.publish(self)
     }
 }

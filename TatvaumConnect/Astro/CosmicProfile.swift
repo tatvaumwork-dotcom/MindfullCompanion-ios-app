@@ -17,6 +17,26 @@ struct CosmicProfile: Sendable {
     let northNode: String
     let southNode: String
     let keywords: [(word: String, emphasised: Bool)]
+    let simple: SimpleView
+
+    /// Plain-language version of the profile ("Simple" mode).
+    struct SimpleView: Sendable {
+        let summary: String
+        let personality: BigThree
+        let feelings: BigThree
+        let firstImpression: BigThree
+        let drives: [Bar]
+        let drivesText: String
+        let style: [Bar]
+        let styleText: String
+        let energy: [Bar]
+        let energyText: String
+        let watchOut: [String]
+        let lifeLesson: String
+        /// Short headline lines for the share card, e.g. "Analytical & helpful at heart".
+        let heartLine: String
+        let insideLine: String
+    }
 
     struct BigThree: Sendable {
         let title: String
@@ -148,6 +168,34 @@ struct CosmicProfile: Sendable {
         let rahuNak = NAK_NAMES[pos[.Rahu]!.nakshatra.ordinal]
         let ketuNak = NAK_NAMES[pos[.Ketu]!.nakshatra.ordinal]
 
+        // --- Simple (no-jargon) view
+        let sun = t(sunS).first, moon = t(moonS).first, asc = t(ascS).first
+        let moonA = moon[moonS == sunS ? 2 : 0], moonB = moon[moonS == sunS ? 3 : 2]
+        let simpleSummary = "You are **\(sun[0])** and **\(sun[1])** at heart. On the inside you are " +
+            "**\(moonA)** and **\(moonB)**, and when people first meet you, " +
+            "you come across as **\(asc[1])** and **\(asc[3])**. \(SIMPLE_ELEMENT[domEl]!.text) " +
+            "What drives you most is **\(SIMPLE_PUR[domPur]!.text)**."
+        var shadows: [String] = []
+        for s in Array(t(sunS).second.prefix(2)) + [t(moonS).second[0]] where !shadows.contains(s) { shadows.append(s) }
+        let watchOut = ["You can sometimes be **\(shadows.joined(separator: "**, **"))**, especially when stressed or tired."] +
+            lowEl.map { SIMPLE_LOW[$0]! }
+        let simple = SimpleView(
+            summary: simpleSummary,
+            personality: BigThree(title: "Your personality", sign: .of(index: sunS), element: ELEMENT_OF[sunS], subtitle: sun[0]),
+            feelings: BigThree(title: "Your feelings", sign: .of(index: moonS), element: ELEMENT_OF[moonS], subtitle: moon[0]),
+            firstImpression: BigThree(title: "First impression", sign: .of(index: ascS), element: ELEMENT_OF[ascS], subtitle: asc[1]),
+            drives: PADA_NAMES.map { Bar(label: SIMPLE_PUR[$0]!.label, percent: purP[$0]!, color: PADA_COLOR[$0]!, top: $0 == domPur) },
+            drivesText: "Most of all you want **\(SIMPLE_PUR[domPur]!.text)**.",
+            style: MODS.map { Bar(label: SIMPLE_MOD[$0]!.label, percent: modP[$0]!, color: MODALITY_TEXT[$0]!.color, top: $0 == domMod) },
+            styleText: SIMPLE_MOD[domMod]!.text,
+            energy: ELEMENTS_ORDER.map { Bar(label: SIMPLE_ELEMENT[$0]!.label, percent: elP[$0]!, color: ELEMENT_COLOR[$0]!, top: $0 == domEl) },
+            energyText: SIMPLE_ELEMENT[domEl]!.text,
+            watchOut: watchOut,
+            lifeLesson: "You grow most by becoming more **\(t(nnS).first.prefix(2).joined(separator: "** and **"))**, " +
+                "and by leaning less on old habits of being \(t(snS).second[0]).",
+            heartLine: "\(sun[0].cap()) & \(sun[1]) at heart",
+            insideLine: "\(moonA.cap()) & \(moonB) inside")
+
         return CosmicProfile(
             summary: sb,
             sun: BigThree(title: "Sun · Self", sign: .of(index: sunS), element: ELEMENT_OF[sunS], subtitle: t(sunS).first[0]),
@@ -162,7 +210,8 @@ struct CosmicProfile: Sendable {
             growthEdges: Array(edges.prefix(6)),
             northNode: "**North Node in \(SIGNS[nnS])** (\(rahuNak)): grow toward being \(t(nnS).first.prefix(3).joined(separator: ", ")).",
             southNode: "**South Node in \(SIGNS[snS])** (\(ketuNak)): you have innate \(t(snS).first[0]) and \(t(snS).first[1]) gifts, but should guard against being \(t(snS).second[0]).",
-            keywords: Array(keywords))
+            keywords: Array(keywords),
+            simple: simple)
     }
 
     // MARK: data
@@ -203,6 +252,33 @@ struct CosmicProfile: Sendable {
         .Jupiter: ["Growth", "Luck", "Wisdom", "Faith", "Abundance"],
         .Saturn: ["Discipline", "Structure", "Karma", "Time", "Mastery"],
     ]
+
+    private static let SIMPLE_ELEMENT: [String: (label: String, text: String)] = [
+        "fire": ("Action", "You run on energy and enthusiasm. You like to jump in, get excited and make things happen."),
+        "earth": ("Practical", "You are down-to-earth and dependable. You like real results, steady progress and finishing what you start."),
+        "air": ("Thinking", "You live in ideas and conversation. You like to talk things through, learn and connect with people."),
+        "water": ("Feeling", "You go by feelings and gut instinct. You sense what others feel and care deeply about the people close to you."),
+    ]
+    private static let SIMPLE_MOD: [String: (label: String, text: String)] = [
+        "Cardinal": ("Starter", "You are a **starter**: you like to take the first step, lead and get things moving."),
+        "Fixed": ("Keeper", "You are a **keeper**: once you commit, you stay loyal and see things through to the end."),
+        "Mutable": ("Adapter", "You are an **adapter**: you go with the flow, handle change well and juggle many things."),
+    ]
+    private static let SIMPLE_PUR: [String: (label: String, text: String)] = [
+        "Dharma": ("Purpose", "doing what is right and having a meaningful purpose"),
+        "Artha": ("Success", "building success, skills, money and security"),
+        "Kama": ("Love & joy", "love, relationships, fun and enjoying life"),
+        "Moksha": ("Inner peace", "peace of mind, freedom and growing as a person"),
+    ]
+    private static let SIMPLE_LOW = [
+        "fire": "Getting motivated can take a push, so set small goals to build momentum.",
+        "earth": "Day-to-day practical stuff (money, routines) may need extra attention.",
+        "air": "Stepping back to see the bigger picture may not come naturally.",
+        "water": "You may keep feelings inside, so practise saying how you feel.",
+    ]
+
+    /// Western essential dignity of a planet in a sign index, or nil (also used by the dasha view).
+    static func dignityOf(_ p: VedicPlanet, _ sign: Int) -> String? { dignity(p, sign) }
 
     private static let DIGNITY: [VedicPlanet: (domicile: [Int], exalted: Int)] = [
         .Sun: ([4], 0), .Moon: ([3], 1), .Mercury: ([2, 5], 5), .Venus: ([1, 6], 11),

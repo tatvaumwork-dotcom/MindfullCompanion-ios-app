@@ -22,7 +22,7 @@ struct ThirdEyeView: View {
                         .accessibilityLabel("Settings")
                 }
                 NudgeCard(store: store)
-                ThisWeek(entry: cur, store: store).id(cur.weekStart)
+                ThisWeek(entry: cur, store: store).id(cur.weekStart).guideTarget(.thisWeek)
                 if !past.isEmpty {
                     SectionTitle("Past weeks").frame(maxWidth: .infinity, alignment: .leading)
                     ForEach(past, id: \.weekStart) { PastQuestion(entry: $0) }

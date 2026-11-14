@@ -2,11 +2,13 @@ import Foundation
 import Observation
 import UserNotifications
 
-/// Set when a Third Eye notification is tapped; the app observes it and switches tab.
+/// Set when a Third Eye notification or widget is tapped (or a new profile is set up);
+/// the main tabs observe it and switch tab.
 @MainActor @Observable
-final class ThirdEyeRouter {
-    static let shared = ThirdEyeRouter()
+final class AppRouter {
+    static let shared = AppRouter()
     static let thirdEyeTab = 2
+    static let profileTab = 3
     /// Tab the app should switch to; the app clears it once handled.
     var requestedTab: Int?
 }
@@ -17,7 +19,7 @@ final class ThirdEyeNotificationDelegate: NSObject, UNUserNotificationCenterDele
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         guard response.notification.request.identifier == ThirdEyeNotifier.id else { return }
-        await MainActor.run { ThirdEyeRouter.shared.requestedTab = ThirdEyeRouter.thirdEyeTab }
+        await MainActor.run { AppRouter.shared.requestedTab = AppRouter.thirdEyeTab }
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {

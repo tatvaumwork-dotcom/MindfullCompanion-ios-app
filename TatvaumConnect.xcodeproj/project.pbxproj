@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		A1000001 /* CAstronomy in Frameworks */ = {isa = PBXBuildFile; productRef = A1000030 /* CAstronomy */; };
+		A2000001 /* TatvaumWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A2000011 /* TatvaumWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A2000002 /* AstroDataKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000069 /* AstroDataKey.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -18,18 +20,50 @@
 			remoteGlobalIDString = A1000010;
 			remoteInfo = TatvaumConnect;
 		};
+		A2000040 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1000050 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2000010;
+			remoteInfo = TatvaumWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A2000016 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A2000001 /* TatvaumWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		A1000011 /* Tatvaum Connect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tatvaum Connect.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000021 /* TatvaumConnectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TatvaumConnectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000060 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		A1000061 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A2000011 /* TatvaumWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TatvaumWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2000061 /* TatvaumWidget-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TatvaumWidget-Info.plist"; sourceTree = "<group>"; };
+		A2000062 /* TatvaumWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TatvaumWidget.entitlements; sourceTree = "<group>"; };
+		A2000063 /* TatvaumConnect.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TatvaumConnect.entitlements; sourceTree = "<group>"; };
+		A2000064 /* encrypt-astro-data.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "encrypt-astro-data.sh"; sourceTree = "<group>"; };
+		A2000065 /* render-logo.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "render-logo.sh"; sourceTree = "<group>"; };
+		A2000066 /* render-logo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "render-logo.swift"; sourceTree = "<group>"; };
+		A2000067 /* house_behaviour.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = house_behaviour.json; sourceTree = "<group>"; };
+		A2000068 /* planet_house_rules.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = planet_house_rules.json; sourceTree = "<group>"; };
+		A2000069 /* AstroDataKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstroDataKey.swift; sourceTree = DERIVED_FILE_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A1000070 /* TatvaumConnect */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = TatvaumConnect; sourceTree = "<group>"; };
 		A1000071 /* TatvaumConnectTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = TatvaumConnectTests; sourceTree = "<group>"; };
+		A2000070 /* TatvaumWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = TatvaumWidget; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +82,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2000012 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -55,7 +96,10 @@
 			isa = PBXGroup;
 			children = (
 				A1000070 /* TatvaumConnect */,
+				A2000070 /* TatvaumWidget */,
 				A1000071 /* TatvaumConnectTests */,
+				A2000083 /* AstroData */,
+				A2000084 /* Scripts */,
 				A1000081 /* Config */,
 				A1000082 /* Products */,
 			);
@@ -66,6 +110,9 @@
 			children = (
 				A1000060 /* Config.xcconfig */,
 				A1000061 /* Info.plist */,
+				A2000063 /* TatvaumConnect.entitlements */,
+				A2000061 /* TatvaumWidget-Info.plist */,
+				A2000062 /* TatvaumWidget.entitlements */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -75,8 +122,29 @@
 			children = (
 				A1000011 /* Tatvaum Connect.app */,
 				A1000021 /* TatvaumConnectTests.xctest */,
+				A2000011 /* TatvaumWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A2000083 /* AstroData */ = {
+			isa = PBXGroup;
+			children = (
+				A2000067 /* house_behaviour.json */,
+				A2000068 /* planet_house_rules.json */,
+				A2000069 /* AstroDataKey.swift */,
+			);
+			path = AstroData;
+			sourceTree = "<group>";
+		};
+		A2000084 /* Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				A2000064 /* encrypt-astro-data.sh */,
+				A2000065 /* render-logo.sh */,
+				A2000066 /* render-logo.swift */,
+			);
+			path = Scripts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -86,13 +154,16 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A1000091 /* Build configuration list for PBXNativeTarget "TatvaumConnect" */;
 			buildPhases = (
+				A2000015 /* Encrypt astro data */,
 				A1000013 /* Sources */,
 				A1000012 /* Frameworks */,
 				A1000014 /* Resources */,
+				A2000016 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A2000041 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A1000070 /* TatvaumConnect */,
@@ -126,6 +197,26 @@
 			productReference = A1000021 /* TatvaumConnectTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		A2000010 /* TatvaumWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2000091 /* Build configuration list for PBXNativeTarget "TatvaumWidgetExtension" */;
+			buildPhases = (
+				A2000013 /* Sources */,
+				A2000012 /* Frameworks */,
+				A2000014 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A2000070 /* TatvaumWidget */,
+			);
+			name = TatvaumWidgetExtension;
+			productName = TatvaumWidgetExtension;
+			productReference = A2000011 /* TatvaumWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -154,6 +245,7 @@
 			targets = (
 				A1000010 /* TatvaumConnect */,
 				A1000020 /* TatvaumConnectTests */,
+				A2000010 /* TatvaumWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -173,17 +265,59 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2000014 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A2000015 /* Encrypt astro data */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Scripts/encrypt-astro-data.sh",
+				"$(SRCROOT)/AstroData/house_behaviour.json",
+				"$(SRCROOT)/AstroData/planet_house_rules.json",
+			);
+			name = "Encrypt astro data";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/AstroDataKey.swift",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/house_behaviour.bin",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/planet_house_rules.bin",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Scripts/encrypt-astro-data.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A1000013 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2000002 /* AstroDataKey.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A1000023 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2000013 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -197,6 +331,11 @@
 			isa = PBXTargetDependency;
 			target = A1000010 /* TatvaumConnect */;
 			targetProxy = A1000040 /* PBXContainerItemProxy */;
+		};
+		A2000041 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2000010 /* TatvaumWidgetExtension */;
+			targetProxy = A2000040 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -294,6 +433,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = Config/TatvaumConnect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = UV3G4NV7SN;
@@ -321,6 +461,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = Config/TatvaumConnect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = UV3G4NV7SN;
@@ -369,6 +510,54 @@
 			};
 			name = Release;
 		};
+		A20000B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/TatvaumWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = UV3G4NV7SN;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/TatvaumWidget-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Third Eye";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tatvaum.connect.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A20000B2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/TatvaumWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = UV3G4NV7SN;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/TatvaumWidget-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Third Eye";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tatvaum.connect.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -395,6 +584,15 @@
 			buildConfigurations = (
 				A10000C1 /* Debug */,
 				A10000C2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2000091 /* Build configuration list for PBXNativeTarget "TatvaumWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A20000B1 /* Debug */,
+				A20000B2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -4,6 +4,10 @@ struct OnboardingView: View {
     let profileStore: ProfileStore
     let pincodes: PincodeGeoService
     let cities: CitySearch
+    /// Set when adding another person's profile: backs out and returns to the previous profile.
+    var onCancel: (() -> Void)?
+    /// Called once the birth details are saved.
+    var onDone: () -> Void = {}
 
     private enum PlaceMode: String, CaseIterable { case city = "Search city", pin = "India PIN code" }
     enum SheetKind: Identifiable { case date, time; var id: Self { self } }
@@ -21,8 +25,10 @@ struct OnboardingView: View {
     @State private var sheet: SheetKind?
     @FocusState private var focused: Bool
 
-    init(profileStore: ProfileStore, pincodes: PincodeGeoService, cities: CitySearch) {
+    init(profileStore: ProfileStore, pincodes: PincodeGeoService, cities: CitySearch,
+         onCancel: (() -> Void)? = nil, onDone: @escaping () -> Void = {}) {
         self.profileStore = profileStore; self.pincodes = pincodes; self.cities = cities
+        self.onCancel = onCancel; self.onDone = onDone
     }
 
     private var pinPlace: PincodePlace? { pincodes.isReady && pincode.count == 6 ? pincodes.resolve(pincode) : nil }
@@ -42,9 +48,15 @@ struct OnboardingView: View {
                     VStack(spacing: 8) {
                         Text("✦").font(.system(size: 48)).foregroundStyle(Cosmic.gold)
                             .phaseAnimator([-5.0, 5.0]) { $0.offset(y: $1) } animation: { _ in .easeInOut(duration: 2.4) }
-                        CosmicTitle(lead: "Welcome to", accent: "Tatvaum", size: 26)
-                        Subtitle("Tell us when and where you were born, and we'll reveal the sky that was waiting for you.")
-                            .multilineTextAlignment(.center).padding(.horizontal, 8)
+                        if onCancel != nil {
+                            CosmicTitle(lead: "Add a", accent: "profile", size: 26)
+                            Subtitle("Enter their name and when and where they were born, and we'll reveal their sky.")
+                                .multilineTextAlignment(.center).padding(.horizontal, 8)
+                        } else {
+                            CosmicTitle(lead: "Welcome to", accent: "Tatvaum", size: 26)
+                            Subtitle("Tell us when and where you were born, and we'll reveal the sky that was waiting for you.")
+                                .multilineTextAlignment(.center).padding(.horizontal, 8)
+                        }
                     }
                     GlassPanel { form }
                     privacyNote
@@ -53,6 +65,14 @@ struct OnboardingView: View {
                 .padding(.horizontal, 24).padding(.vertical, 32)
             }
             .scrollDismissesKeyboard(.interactively)
+        }
+        .overlay(alignment: .topLeading) {
+            if let onCancel {
+                Button(action: onCancel) {
+                    Label("Cancel", systemImage: "chevron.left").font(.system(size: 15, weight: .medium)).foregroundStyle(Cosmic.gold)
+                        .padding(.horizontal, 16).padding(.vertical, 10)
+                }
+            }
         }
         .sheet(item: $sheet) { s in
             PickerSheet(kind: s, date: $date, time: $time).presentationDetents([s == .date ? .large : .height(320)])
@@ -176,6 +196,7 @@ struct OnboardingView: View {
                                         preferredName: preferredName.trimmingCharacters(in: .whitespaces), gender: gender,
                                         dateOfBirth: moment, timeOfBirth: moment, timezone: p.tz, placeOfBirth: p.label,
                                         latitude: p.lat, longitude: p.lon)
+        onDone()
     }
 }
 

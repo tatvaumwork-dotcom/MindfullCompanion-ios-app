@@ -16,7 +16,10 @@ struct TatvaumConnectApp: App {
         }
         .onChange(of: phase) { _, p in
             switch p {
-            case .active: Task { await ThirdEyeNotifier.ensure(seed: container.thirdEye.seed) }  // keep next Monday's question current
+            case .active:
+                Task { await ThirdEyeNotifier.ensure(seed: container.thirdEye.seed) }  // keep next Monday's question current
+                container.thirdEye.current()
+                ThirdEyeWidgetBridge.publish(container.thirdEye)                     // and the widget's weeks ahead
             case .background: container.chat.save()
             default: break
             }

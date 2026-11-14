@@ -8,10 +8,13 @@ final class HistoryStore {
     /// Messages of the unfinished session, restored at launch.
     @ObservationIgnored let restoredActiveMessages: [ChatMessage]
 
-    @ObservationIgnored private let summariesFile = JSONFile<[ConversationSummary]>("history.json")
-    @ObservationIgnored private let activeFile = JSONFile<[ChatMessage]>("active_session.json")
+    @ObservationIgnored private let summariesFile: JSONFile<[ConversationSummary]>
+    @ObservationIgnored private let activeFile: JSONFile<[ChatMessage]>
 
-    init() {
+    /// `dir` is the owning profile's folder.
+    init(dir: URL) {
+        summariesFile = JSONFile("history.json", in: dir)
+        activeFile = JSONFile("active_session.json", in: dir)
         summaries = summariesFile.read() ?? []
         restoredActiveMessages = activeFile.read() ?? []
     }
