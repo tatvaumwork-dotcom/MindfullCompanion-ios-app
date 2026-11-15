@@ -6,6 +6,10 @@ struct MessageBubble: View {
     private var isUser: Bool { message.role == .user }
 
     var body: some View {
+        if message.isCrisisSupport == true { CrisisCard() } else { bubble }
+    }
+
+    @ViewBuilder private var bubble: some View {
         let shape = UnevenRoundedRectangle(topLeadingRadius: 20, bottomLeadingRadius: isUser ? 20 : 6,
                                            bottomTrailingRadius: isUser ? 6 : 20, topTrailingRadius: 20)
         let fg = isUser ? Cosmic.onGold : Color(argb: 0xFFE1E3FA), accent = isUser ? Cosmic.onGold : Cosmic.gold
@@ -68,6 +72,51 @@ struct MessageBubble: View {
         }
         flush()
         return out
+    }
+}
+
+/// Shown when a message suggests the person may be thinking of suicide or self-harm:
+/// tappable helplines for their region, then the companion's reply follows.
+struct CrisisCard: View {
+    private let region = CrisisSupport.region()
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("You're not alone", systemImage: "heart.fill")
+                .font(.system(size: 16, weight: .bold)).foregroundStyle(Cosmic.gold)
+            Text("It sounds like you're going through something really painful, and I'm glad you said it. Please reach out to someone who can help right now.")
+                .font(.system(size: 14.5)).lineSpacing(3).foregroundStyle(Color(argb: 0xFFE1E3FA))
+            if let region {
+                ForEach(region.lines, id: \.dial) { line in
+                    HStack(spacing: 8) {
+                        action("\(line.name) · \(line.display)", icon: "phone.fill", url: "tel:\(line.dial)")
+                        if let sms = line.sms { action("Text", icon: "message.fill", url: "sms:\(sms)", compact: true) }
+                    }
+                }
+                action("Emergency · \(region.emergency)", icon: "staroflife.fill", url: "tel:\(region.emergency)")
+            } else {
+                action("Find a helpline near you", icon: "globe", url: CrisisSupport.directory.absoluteString)
+                Text("Or call your local emergency number.").font(.system(size: 13)).foregroundStyle(Cosmic.muted)
+            }
+            Text("If you're in immediate danger, call emergency services or go to the nearest hospital.")
+                .font(.system(size: 12.5)).foregroundStyle(Cosmic.muted)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(argb: 0x1FF5C66B), in: RoundedRectangle(cornerRadius: 18))
+        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color(argb: 0x73F5C66B)))
+        .accessibilityElement(children: .contain)
+    }
+
+    private func action(_ title: String, icon: String, url: String, compact: Bool = false) -> some View {
+        Link(destination: URL(string: url)!) {
+            Label(title, systemImage: icon)
+                .font(.system(size: 14.5, weight: .semibold)).foregroundStyle(Cosmic.onGold)
+                .lineLimit(2).multilineTextAlignment(.leading)
+                .padding(.horizontal, 14).padding(.vertical, 10)
+                .frame(maxWidth: compact ? nil : .infinity, alignment: .leading)
+                .background(Cosmic.goldGradient, in: RoundedRectangle(cornerRadius: 12))
+        }
     }
 }
 

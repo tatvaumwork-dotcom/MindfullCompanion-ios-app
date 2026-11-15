@@ -12,6 +12,11 @@ struct ChatMessage: Codable, Identifiable, Equatable {
     var timestamp = nowMillis()
     /// Locally generated error notice (e.g. quota/auth failure). Never sent to the AI.
     var isError = false
+    /// Crisis-support card added by the self-harm check. Optional so older saved chats still load. Never sent to the AI.
+    var isCrisisSupport: Bool?
+
+    /// Shown in the chat but kept out of what's sent to the AI and summarised.
+    var isLocalNotice: Bool { isError || isCrisisSupport == true }
 }
 
 struct ConversationSummary: Codable, Identifiable {

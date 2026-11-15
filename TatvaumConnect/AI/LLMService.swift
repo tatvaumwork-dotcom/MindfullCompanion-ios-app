@@ -24,7 +24,7 @@ final class LLMService {
     /// Text stream for a chat turn. `history` excludes `text`.
     func stream(_ text: String, history: [ChatMessage], systemPrompt: String) -> AsyncThrowingStream<String, Error> {
         var messages = [LlmMessage(role: "system", content: systemPrompt)]
-        messages += history.filter { !$0.isError && !$0.content.isEmpty }.suffix(historyWindow)
+        messages += history.filter { !$0.isLocalNotice && !$0.content.isEmpty }.suffix(historyWindow)
             .map { LlmMessage(role: $0.role == .user ? "user" : "assistant", content: $0.content) }
         messages.append(LlmMessage(role: "user", content: text))
         return gemini.stream(messages)
@@ -57,7 +57,7 @@ final class LLMService {
 
     /// Summary and profile extraction run one after another; very long sessions are trimmed.
     func processEndOfSession(_ messages: [ChatMessage]) async -> SessionResult {
-        let usable = messages.filter { !$0.isError }
+        let usable = messages.filter { !$0.isLocalNotice }
         let transcript = String(usable.map { "\($0.role == .user ? "User" : "Assistant"): \($0.content)" }
             .joined(separator: "\n").suffix(24000))
         let userLines = String(usable.filter { $0.role == .user }.map(\.content).joined(separator: "\n").suffix(16000))

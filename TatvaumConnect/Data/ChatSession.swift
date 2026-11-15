@@ -30,10 +30,14 @@ final class ChatSession {
         let history = messages
         messages.append(ChatMessage(role: .user, content: text))
 
-        // Input-side guardrail: disallowed content never reaches the model.
+        // Input-side guardrail: disallowed content never reaches the model. A self-harm signal
+        // isn't blocked: show crisis helplines first, then let the companion reply with care.
         if let v = ChatGuardrail.evaluate(text) {
-            messages.append(ChatMessage(role: .assistant, content: ChatGuardrail.fallbackMessage(v)))
-            save(); return
+            if ChatGuardrail.blocks(v) {
+                messages.append(ChatMessage(role: .assistant, content: ChatGuardrail.fallbackMessage(v)))
+                save(); return
+            }
+            messages.append(ChatMessage(role: .assistant, content: ChatGuardrail.fallbackMessage(v), isCrisisSupport: true))
         }
 
         let replyID = newID()
@@ -60,7 +64,7 @@ final class ChatSession {
                 replace(replyID) { $0.content = msg; $0.isError = true }
             } else {
                 // Output-side guardrail.
-                let v = ChatGuardrail.evaluate(final)
+                let v = ChatGuardrail.evaluate(final, isInput: false)
                 replace(replyID) { $0.content = v.map(ChatGuardrail.fallbackMessage) ?? final }
             }
             isGenerating = false; streamTask = nil
