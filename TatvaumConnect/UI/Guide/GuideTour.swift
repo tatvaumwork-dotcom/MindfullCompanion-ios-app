@@ -12,7 +12,7 @@ enum GuidePrefs {
 
 /// Controls the tour can point at.
 enum GuideID: String {
-    case tabBar, aiStatus, pastChats, skyView, thisWeek, profileViews, share, settings
+    case tabBar, aiStatus, pastChats, skyView, fullSky, thisWeek, profileViews, share, settings
 }
 
 /// Where each highlighted control currently sits on screen (global coordinates).
@@ -66,6 +66,7 @@ private let steps: [GuideStep] = [
     GuideStep(tab: 0, target: .aiStatus, title: "Companion status", body: "Green means your companion is ready. If it says busy or offline, tap it to check again."),
     GuideStep(tab: 1, target: .tabBar, title: "Planets", body: "The real sky at the moment you were born, calculated from your birth time and place, with Earth at the centre."),
     GuideStep(tab: 1, target: .skyView, title: "Your birth sky", body: "Drag to rotate, pinch to zoom, and tap any planet to see where it was and what it means for you."),
+    GuideStep(tab: 1, target: .fullSky, title: "Full-screen sky", body: "Open your birth sky in 3D: tap Earth for a guided tour, or tap any planet to read what it means for you."),
     GuideStep(tab: 2, target: .tabBar, title: "3rd Eye", body: "A new reflective question arrives every Monday. Sit with it during the week."),
     GuideStep(tab: 2, target: .thisWeek, title: "This week's question", body: "Write whatever comes up and save it. Your past weeks stay below, so you can look back on them."),
     GuideStep(tab: 3, target: .tabBar, title: "Profile", body: "Your cosmic profile: your nature, strengths, the life cycle you're in now, and what you've shared with your companion."),

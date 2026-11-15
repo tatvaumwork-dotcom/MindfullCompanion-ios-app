@@ -30,7 +30,7 @@ struct SettingsView: View {
                     SectionCard(title: "Birth details") {
                         ActionRow(icon: "calendar.badge.clock", text: "Re-enter birth details for \(name)") { confirmReset = true }
                     }
-                    Text("Place data © GeoNames (geonames.org), CC BY 4.0. Star and constellation data © d3-celestial (Olaf Frohn), BSD-3-Clause.")
+                    Text("Place data © GeoNames (geonames.org), CC BY 4.0. Star and constellation data © d3-celestial (Olaf Frohn), BSD-3-Clause. 3D sky uses three.js © three.js authors, MIT.")
                         .font(.caption).foregroundStyle(Cosmic.muted).multilineTextAlignment(.center)
                     Text("Tatvaum \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")")
                         .font(.caption).foregroundStyle(Cosmic.muted)

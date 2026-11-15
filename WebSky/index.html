@@ -1,0 +1,2601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#05060d" />
+<title>Celestial Birth Chart · 3D</title>
+<link rel="icon" type="image/svg+xml" href="tatvaum-logo.svg" />
+<style>
+  :root {
+    --bg: #05060d;
+    --panel: rgba(14, 16, 32, 0.82);
+    --border: rgba(160, 170, 255, 0.18);
+    --text: #e6e8ff;
+    --muted: #9aa0c8;
+    --accent: #f5c66b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; overflow: hidden; }
+  #scene { position: fixed; inset: 0; }
+  #labels { position: fixed; inset: 0; pointer-events: none; }
+
+  .panel {
+    position: fixed; top: 16px; left: 16px; width: 360px; max-height: calc(100% - 32px);
+    overflow-y: auto; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px 18px 14px; backdrop-filter: blur(10px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 5;
+  }
+  .panel::-webkit-scrollbar { width: 6px; }
+  .panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+  h1 { font-size: 18px; margin: 0 0 2px; letter-spacing: 0.5px; }
+  h1 span { color: var(--accent); }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted);
+    margin: 16px 0 8px; font-weight: 600; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .grid > label { min-width: 0; }
+  .grid input, .grid select { width: 100%; min-width: 0; }
+  label { display: flex; flex-direction: column; font-size: 11px; color: var(--muted); gap: 4px; }
+  input, select {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 7px 8px; font-size: 13px; font-family: inherit; color-scheme: dark;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); }
+  .span2 { grid-column: span 2; }
+  .combo { position: relative; }
+  .combo input[type=text] { width: 100%; }
+  .combo-list { display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; max-height: 230px;
+    overflow-y: auto; background: #12142a; border: 1px solid var(--border); border-radius: 8px; z-index: 20;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+  .combo-list.open { display: block; }
+  .combo-opt { padding: 7px 10px; font-size: 12.5px; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; gap: 8px; }
+  .combo-opt small { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .combo-opt.active { background: rgba(245,198,107,0.18); }
+  .combo-opt.sel { color: var(--accent); }
+  .combo-opt span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .combo-opt small { flex-shrink: 0; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .combo input:disabled { opacity: .5; }
+  .coords { font-size: 11.5px; color: var(--muted); margin-top: -2px; line-height: 1.4; }
+  .coords b { color: var(--text); font-weight: 600; }
+  details.manual { font-size: 11.5px; color: var(--muted); }
+  details.manual summary { cursor: pointer; padding: 2px 0; }
+  details.manual .grid { margin-top: 8px; }
+  .combo-empty { padding: 8px 10px; font-size: 12px; color: var(--muted); }
+  .row { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  button {
+    background: linear-gradient(135deg, #f5c66b, #e08a4f); border: none; color: #1a1020;
+    font-weight: 700; padding: 9px 14px; border-radius: 9px; cursor: pointer; font-size: 13px;
+  }
+  button.ghost { background: rgba(255,255,255,0.07); color: var(--text); font-weight: 500;
+    border: 1px solid var(--border); }
+  button:hover { filter: brightness(1.1); }
+  .toggles { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; font-size: 12px; color: var(--muted); }
+  .toggles label { flex-direction: row; align-items: center; gap: 5px; font-size: 12px; cursor: pointer; }
+  .toggles input { padding: 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  td { padding: 5px 4px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; }
+  td.g { font-size: 17px; width: 24px; text-align: center; }
+  td.deg { font-variant-numeric: tabular-nums; }
+  td.r { color: #ff8a8a; font-size: 11px; font-weight: 700; }
+  td.h { color: var(--muted); font-size: 11px; text-align: right; }
+  td.nk { color: var(--muted); font-size: 11px; }
+  td.nk .kp { color: var(--accent); font-size: 10.5px; letter-spacing: .02em; }
+  tr:hover td { background: rgba(255,255,255,0.04); }
+  tr { cursor: pointer; }
+  .sign-g { font-size: 15px; margin-right: 3px; }
+  .aspects { font-size: 12px; color: var(--muted); line-height: 1.7; columns: 2; column-gap: 12px; }
+  .aspects > span { display: block; break-inside: avoid; }
+  .note { font-size: 10.5px; color: #6f75a0; margin-top: 14px; line-height: 1.5; }
+
+  .label {
+    color: #fff; font-size: 12px; padding: 2px 6px; border-radius: 6px;
+    background: rgba(10, 12, 28, 0.6); border: 1px solid rgba(255,255,255,0.12);
+    white-space: nowrap; transform: translateY(-14px); text-shadow: 0 0 4px #000;
+  }
+  .label.star { background: none; border: none; color: #c9d4ff; font-size: 10.5px; opacity: 0.85; }
+  .label.sign { background: none; border: none; font-size: 22px; transform: none; text-shadow: 0 0 10px currentColor; }
+  .label.const { background: none; border: none; font-size: 11px; font-style: italic; letter-spacing: 1.5px; color: #8fb4ff; opacity: .75; transform: none; text-transform: uppercase; }
+  .label.nak { background: none; border: none; font-size: 9.5px; transform: none; opacity: 0.85; text-shadow: 0 0 4px #000; letter-spacing: .3px; }
+  .label.node { border-color: rgba(200,140,255,0.5); }
+  .label.angle { border-color: rgba(245,198,107,0.6); color: var(--accent); font-weight: 700; }
+  .label.hl { background: rgba(245,198,107,0.9); color: #1a1020; text-shadow: none; }
+
+  /* floating planet popup */
+  .popup {
+    position: fixed; z-index: 15; width: 330px; max-height: 70vh; overflow-y: auto; display: none;
+    background: linear-gradient(160deg, rgba(22,24,48,0.94), rgba(10,11,26,0.94));
+    border: 1px solid var(--pc, #f5c66b); border-radius: 16px; padding: 16px 16px 12px;
+    box-shadow: 0 0 30px -6px var(--pc, #f5c66b), 0 20px 50px rgba(0,0,0,0.6);
+    backdrop-filter: blur(12px); font-size: 13px; line-height: 1.55;
+    opacity: 0; transform: scale(0.92); transition: opacity .25s ease, transform .25s ease;
+  }
+  .popup.show { opacity: 1; transform: scale(1); }
+  .popup::-webkit-scrollbar { width: 5px; }
+  .popup::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+  .popup .close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: var(--muted);
+    font-size: 18px; padding: 2px 6px; cursor: pointer; font-weight: 400; }
+  .ip-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .ip-glyph { font-size: 34px; line-height: 1; color: var(--pc); text-shadow: 0 0 16px var(--pc); width: 44px; text-align: center; }
+  .ip-name { font-size: 18px; font-weight: 700; }
+  .ip-pos { color: var(--muted); font-size: 12px; }
+  .ip-chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 10px; }
+  .ip-chips span { font-size: 10.5px; padding: 2px 8px; border-radius: 20px; background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1); color: #d6d9f5; }
+  .ip-chips span.dig { border-color: var(--pc); color: var(--pc); }
+  .ip-sec { margin-top: 10px; }
+  .ip-sec h4 { margin: 0 0 3px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--pc); font-weight: 700; }
+  .ip-sec p { margin: 0; color: #d8dbf3; }
+  .ip-sec p.muted { color: var(--muted); font-style: italic; font-size: 12px; }
+  .pada-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; margin-left: 4px; color: #10111f; vertical-align: 1px; }
+  .ip-asp { color: #c9cdf0; font-size: 12px; }
+  .ip-asp div { padding: 1px 0; }
+
+  /* guided tour */
+  .tour {
+    position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px); width: min(620px, calc(100% - 32px));
+    z-index: 14; display: none; opacity: 0; transition: opacity .4s ease, transform .4s ease;
+    background: linear-gradient(160deg, rgba(22,24,48,0.92), rgba(10,11,26,0.92)); backdrop-filter: blur(12px);
+    border: 1px solid var(--pc, #f5c66b); border-radius: 18px; padding: 16px 20px 12px;
+    box-shadow: 0 0 40px -8px var(--pc, #f5c66b), 0 20px 50px rgba(0,0,0,0.6); font-size: 13.5px; line-height: 1.55;
+  }
+  .tour.show { opacity: 1; transform: translate(-50%, 0); }
+  .tour .ip-sec p { font-size: 13px; }
+  .tour-body { max-height: 30vh; overflow-y: auto; }
+  .tour-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; gap: 10px; }
+  .tour-dots { display: flex; gap: 5px; flex-wrap: wrap; }
+  .tour-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.18); cursor: pointer; }
+  .tour-dots i.on { background: var(--pc); box-shadow: 0 0 8px var(--pc); }
+  .tour-btns { display: flex; gap: 6px; }
+  .tour-btns button { padding: 6px 11px; font-size: 12px; }
+  .tour-progress { height: 2px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+  .tour-progress div { height: 100%; width: 0; background: var(--pc); }
+  body.touring .panel, body.touring .legend, body.touring .profile, body.touring .profile-toggle { opacity: 0; pointer-events: none; }
+  /* right-hand profile pane */
+  .profile { left: auto; right: 16px; top: 16px; width: 350px; max-height: calc(100% - 84px); }
+  .profile.hidden { transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; }
+  .profile { transition: transform .45s ease, opacity .45s ease; }
+  .profile-toggle { position: fixed; right: 16px; top: 16px; z-index: 6; display: none; }
+  .profile.hidden ~ .profile-toggle { display: block; }
+  .pf-hide { position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--muted); font-size: 16px; padding: 2px 6px; font-weight: 400; }
+  .profile h1 { margin-top: 26px; }
+  .pf-top { position: absolute; top: 12px; right: 40px; display: flex; gap: 6px; align-items: center; }
+  .pf-share { display: inline-flex; align-items: center; gap: 5px; background: rgba(245,198,107,0.12); border: 1px solid rgba(245,198,107,0.45); color: var(--accent);
+    font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; cursor: pointer; }
+  .pf-share:hover { background: var(--accent); color: #111; }
+  .pf-share.busy { opacity: .6; pointer-events: none; }
+  .share-modal { position: fixed; inset: 0; z-index: 50; background: rgba(3,4,10,0.82); backdrop-filter: blur(6px); display: grid; place-items: center; padding: 16px; }
+  .share-modal[hidden] { display: none; }
+  .share-card { display: grid; gap: 12px; justify-items: center; max-width: min(440px, 100%); }
+  .share-card img { width: 100%; max-height: calc(100vh - 150px); object-fit: contain; border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); border: 1px solid var(--border); }
+  .share-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .share-actions .btn { background: var(--accent); color: #111; font-weight: 700; font-size: 13px; padding: 8px 16px; border-radius: 8px; text-decoration: none; }
+  .share-hint { font-size: 11.5px; color: var(--muted); text-align: center; }
+  .pf-mode { display: flex; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 999px; padding: 2px; }
+  .pf-mode button { background: none; border: none; color: var(--muted); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 999px; cursor: pointer; }
+  .pf-mode button.on { background: var(--accent); color: #111; font-weight: 600; }
+  .pf-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 12px 0 4px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
+  .pf-tabs button { background: none; border: none; color: var(--muted); font-size: 12px; font-weight: 600; padding: 6px; border-radius: 7px; cursor: pointer; letter-spacing: .03em; }
+  .pf-tabs button.on { background: rgba(255,255,255,0.10); color: #fff; box-shadow: inset 0 -2px 0 var(--accent); }
+  .ds { display: grid; gap: 8px; margin: 10px 0 4px; }
+  .ds-row { display: grid; grid-template-columns: 92px 1fr; gap: 8px; padding: 7px 8px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.06); border-radius: 9px; }
+  .ds-lvl { font-size: 11px; font-weight: 600; color: #e1e3fa; line-height: 1.3; }
+  .ds-lvl small, .ds-main small { display: block; font-size: 9.5px; font-weight: 400; color: var(--muted); }
+  .ds-main { font-size: 12.5px; font-weight: 600; min-width: 0; }
+  .ds-main .ring { height: 3px; border-radius: 2px; background: rgba(255,255,255,0.07); margin: 4px 0 3px; overflow: hidden; }
+  .ds-main .ring i { display: block; height: 100%; }
+  .ds-mood { font-size: 10px; font-weight: 500; color: var(--accent); margin-left: 4px; text-transform: uppercase; letter-spacing: .05em; }
+  .dl { cursor: pointer; white-space: nowrap; }
+  .ds-tl { width: 100%; border-collapse: collapse; font-size: 11.5px; color: #c9cce8; }
+  .ds-tl td { padding: 3px 4px; border-bottom: 1px solid rgba(255,255,255,0.04); font-variant-numeric: tabular-nums; }
+  .ds-tl td + td { text-align: right; color: var(--muted); }
+  .ds-tl tr.on td { background: rgba(245,198,107,0.10); color: #fff; font-weight: 600; }
+  .ds-tl tr.past td { opacity: .5; }
+  .pf-summary { font-size: 13.5px; line-height: 1.65; color: #e1e3fa; }
+  .pf-summary b { color: var(--accent); font-weight: 600; }
+  .big3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .big3 > div { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 8px 6px; text-align: center; cursor: pointer; }
+  .big3 > div:hover { border-color: var(--accent); }
+  .big3 .t { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .big3 .s { font-size: 22px; line-height: 1.3; }
+  .big3 .n { font-size: 12px; font-weight: 600; }
+  .big3 .k { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+  .bars { display: grid; gap: 5px; }
+  .bar { display: grid; grid-template-columns: 74px 1fr 34px; align-items: center; gap: 8px; font-size: 11.5px; color: var(--muted); }
+  .bar .track { height: 7px; border-radius: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
+  .bar .fill { height: 100%; border-radius: 4px; transition: width .8s ease; }
+  .bar .v { text-align: right; font-variant-numeric: tabular-nums; }
+  .bar.top { color: var(--text); font-weight: 600; }
+  .odo { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 12px; color: #d6d9f2; margin-top: 6px; }
+  .odo th { font-size: 10px; font-weight: 500; color: var(--muted); text-align: right; padding: 0 4px 4px; letter-spacing: .04em; text-transform: uppercase; }
+  .odo td { padding: 4px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+  .odo td.g { font-size: 14px; text-align: center; }
+  .odo td.num { text-align: right; font-variant-numeric: tabular-nums; color: #fff; font-weight: 600; }
+  .odo td small.st { color: #b9bde0; }
+  .odo td small { display: block; font-size: 9.5px; font-weight: 400; color: var(--muted); }
+  .odo td.num small { display: block; font-size: 9.5px; font-weight: 400; color: var(--muted); }
+  .odo .ring { height: 3px; border-radius: 2px; background: rgba(255,255,255,0.07); margin: 3px 0 1px auto; width: 70px; overflow: hidden; }
+  .odo .ring i { display: block; height: 100%; }
+  .pf-text { font-size: 12.5px; color: #d0d3ee; line-height: 1.55; margin: 6px 0 0; }
+  .pf-list { margin: 0; padding-left: 0; list-style: none; font-size: 12.5px; line-height: 1.5; color: #d6d9f2; }
+  .pf-list li { padding: 4px 0 4px 18px; position: relative; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .pf-list li::before { content: attr(data-i); position: absolute; left: 0; top: 4px; }
+  .pf-list li b { color: #fff; font-weight: 600; }
+  .cloud { display: flex; flex-wrap: wrap; gap: 5px; }
+  .cloud span { padding: 3px 9px; border-radius: 14px; font-size: 11.5px; background: rgba(245,198,107,0.1); border: 1px solid rgba(245,198,107,0.3); color: #f3dcae; }
+  .cloud span.w2 { font-size: 13px; font-weight: 600; background: rgba(245,198,107,0.18); }
+  .panel, .legend { transition: opacity .5s ease; }
+  .hint { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 6; font-size: 12px; color: var(--muted);
+    background: var(--panel); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; pointer-events: none;
+    transition: opacity .6s; }
+  body.touring .hint { opacity: 0; }
+
+  .legend { position: fixed; right: 16px; bottom: 16px; font-size: 11px; color: var(--muted);
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; z-index: 5; }
+  .legend i { display: inline-block; width: 14px; height: 2px; vertical-align: middle; margin: 0 4px 0 8px; }
+  .collapse { position: fixed; top: 16px; left: 16px; z-index: 6; display: none; }
+  /* ---------- PIN gate ---------- */
+  body.locked .panel, body.locked .tabbar, body.locked .hint, body.locked .legend,
+  body.locked .profile-toggle, body.locked #labels { display: none !important; }
+  .gate { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px;
+    background: radial-gradient(ellipse at 30% 20%, rgba(120,60,200,0.25), transparent 60%),
+                radial-gradient(ellipse at 75% 80%, rgba(40,110,220,0.22), transparent 60%), #05060d;
+    transition: opacity .6s ease; }
+  .gate.gone { opacity: 0; pointer-events: none; }
+  .gate-card { width: min(360px, 100%); text-align: center; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 20px; padding: 30px 26px 24px; backdrop-filter: blur(10px); box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+  .gate-icon { font-size: 40px; color: var(--accent); text-shadow: 0 0 24px rgba(245,198,107,0.6); }
+  .gate h1 { font-size: 20px; margin: 10px 0 4px; }
+  .gate p { color: var(--muted); font-size: 13px; margin: 0 0 22px; }
+  .pin { display: flex; gap: 12px; justify-content: center; }
+  .pin input { width: 54px; height: 62px; text-align: center; font-size: 26px; font-weight: 700; border-radius: 12px;
+    padding: 0; caret-color: var(--accent); -webkit-text-security: disc; }
+  .pin.err input { border-color: #ff6b6b; }
+  .pin.shake { animation: shake .4s; }
+  @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+  .gate-msg { min-height: 18px; margin-top: 14px; font-size: 12.5px; color: #ff8a8a; }
+  .gate-msg.ok { color: #7bd88f; }
+  .tabbar { display: none; }
+  .hint .mob { display: none; }
+
+  /* ---------- Tablet: profile collapses to a button ---------- */
+  @media (max-width: 1100px) {
+    .panel { width: 330px; }
+    .profile { width: 330px; z-index: 7; }
+  }
+
+  /* ---------- Phone: full-screen sky + bottom sheets ---------- */
+  @media (max-width: 760px) {
+    :root { --tabbar-h: calc(58px + env(safe-area-inset-bottom)); }
+    html, body { height: 100dvh; }
+    input, select { font-size: 16px; } /* prevents iOS zoom-on-focus */
+    .panel, .profile, .profile.hidden {
+      left: 0; right: 0; top: auto; bottom: var(--tabbar-h); width: auto;
+      max-height: 64dvh; border-radius: 20px 20px 0 0; padding: 16px 16px 18px;
+      border-left: none; border-right: none; border-bottom: none;
+      transform: translateY(calc(100% + 80px)); opacity: 1; pointer-events: auto;
+      transition: transform .38s cubic-bezier(.2,.8,.2,1); z-index: 9;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.55);
+    }
+    .panel.sheet-open, .profile.sheet-open, .profile.hidden.sheet-open { transform: none; }
+    .panel::before { content: ''; display: block; width: 40px; height: 4px; border-radius: 2px;
+      background: rgba(255,255,255,0.22); margin: -6px auto 10px; }
+    .pf-hide, .profile-toggle, .profile.hidden ~ .profile-toggle, .legend { display: none !important; }
+    h1 { font-size: 17px; }
+    .grid { gap: 10px; }
+    .row button { flex: 1; padding: 11px 12px; }
+    .toggles { gap: 10px 14px; }
+    .toggles label { font-size: 13px; }
+    td { padding: 7px 4px; }
+    .aspects { columns: 1; }
+
+    .tabbar {
+      display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 12;
+      height: var(--tabbar-h); padding: 6px 6px env(safe-area-inset-bottom);
+      background: rgba(10, 11, 24, 0.94); backdrop-filter: blur(12px); border-top: 1px solid var(--border);
+    }
+    .tabbar button {
+      flex: 1; background: none; border: none; color: var(--muted); font-weight: 500; font-size: 11px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; border-radius: 10px;
+    }
+    .tabbar button span { font-size: 19px; line-height: 1; }
+    .tabbar button.on { color: var(--accent); background: rgba(245,198,107,0.08); }
+    body.touring .tabbar { display: none; }
+
+    .hint { top: calc(10px + env(safe-area-inset-top)); font-size: 11px; padding: 5px 12px; max-width: 92%; white-space: nowrap; }
+    .hint .desk { display: none; } .hint .mob { display: inline; }
+    body.sheet-up .hint { opacity: 0; }
+
+    /* planet popup becomes a bottom sheet */
+    .popup { left: 8px !important; right: 8px; top: auto !important; bottom: calc(var(--tabbar-h) + 8px);
+      width: auto; max-height: 56dvh; transform: translateY(20px); }
+    .popup.show { transform: none; }
+    .ip-glyph { font-size: 28px; width: 36px; }
+    .ip-name { font-size: 16px; }
+
+    .tour { bottom: calc(8px + env(safe-area-inset-bottom)); padding: 12px 14px 10px; width: calc(100% - 16px); }
+    .tour-body { max-height: 38dvh; }
+    .tour-nav { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tour-dots { justify-content: center; }
+    .tour-btns button { flex: 1; padding: 9px 4px; }
+
+    .label { font-size: 10px; padding: 1px 4px; transform: translateY(-11px); }
+    .label.star { font-size: 9px; }
+    .label.nak { font-size: 7.5px; }
+    .label.const { font-size: 8.5px; }
+    .label.sign { font-size: 17px; }
+    .big3 .s { font-size: 20px; }
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body class="locked">
+<!-- Splash: tatvaum "t" logo with its planet orbiting while the app loads -->
+<div id="splash" style="position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  background:radial-gradient(ellipse at 50% 45%,#1a1236 0%,#0b0d1f 55%,#05060d 100%);transition:opacity .6s ease, visibility .6s;">
+  <svg id="splashLogo" viewBox="0 0 1254 1254" width="168" height="168" aria-label="Loading"
+    style="filter:drop-shadow(0 0 28px rgba(245,198,107,0.25)) drop-shadow(0 12px 40px rgba(0,0,0,0.6));">
+    <rect x="58" y="58" width="1138" height="1138" rx="250" fill="#000" stroke="rgba(253,248,241,0.12)" stroke-width="6"/>
+    <g fill="#FDF8F1">
+      <path fill-rule="evenodd" transform="rotate(-13 640 600)"
+        d="M228,600 A412,168 0 1,0 1052,600 A412,168 0 1,0 228,600 Z M300,603 A368,118 0 1,0 1036,603 A368,118 0 1,0 300,603 Z"/>
+      <g id="splashBack"></g>
+      <path d="M540,322 L643,250 L643,800 C643,862 672,912 722,920 C764,926 806,912 836,890 C846,884 852,893 846,902 C818,948 772,986 706,986 C612,986 541,906 541,800 Z"/>
+      <g id="splashFront"><g id="splashPlanet"><circle r="61" fill="#000"/><circle id="splashBody" r="57"/></g></g>
+    </g>
+  </svg>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+    <div style="font:700 30px/1 Inter,system-ui,-apple-system,sans-serif;letter-spacing:.42em;margin-right:-.42em;color:#FDF8F1;text-shadow:0 0 22px rgba(245,198,107,0.25);">TATVAUM</div>
+    <div style="font:500 11px/1 Inter,system-ui,-apple-system,sans-serif;letter-spacing:.32em;margin-right:-.32em;text-transform:uppercase;color:#9aa0c8;">Aligning the stars…</div>
+  </div>
+</div>
+<script>
+(() => {
+  // planet runs along the orbit's centre line (ellipse centred ~(650,601), tilted -13°); behind the "t" on the far side
+  const planet = document.getElementById('splashPlanet'), back = document.getElementById('splashBack'), front = document.getElementById('splashFront');
+  const cx = 652, cy = 602, a = 392, b = 144, rot = -13 * Math.PI / 180, cr = Math.cos(rot), sr = Math.sin(rot);
+  const t0 = performance.now(), PERIOD = 2400;
+  let raf;
+  (function step(now) {
+    const th = 0.28 + (now - t0) / PERIOD * 2 * Math.PI;      // starts near the logo's resting position (right side)
+    const ex = a * Math.cos(th), ey = b * Math.sin(th);
+    const x = cx + ex * cr - ey * sr, y = cy + ex * sr + ey * cr;
+    const depth = Math.sin(th);                                // >0: near side (lower half), <0: far side
+    planet.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${(0.86 + 0.14 * depth).toFixed(3)})`);
+    const host = depth < 0 ? back : front;
+    if (planet.parentNode !== host) host.appendChild(planet);
+    raf = requestAnimationFrame(step);
+  })(t0);
+  const MIN_MS = 1800, start = Date.now();
+  const hide = () => setTimeout(() => {
+    const el = document.getElementById('splash');
+    el.style.opacity = '0'; el.style.visibility = 'hidden';
+    setTimeout(() => { cancelAnimationFrame(raf); el.remove(); }, 700);
+  }, Math.max(0, MIN_MS - (Date.now() - start)));
+  if (document.readyState === 'complete') hide(); else addEventListener('load', hide);
+})();
+</script>
+<div class="gate" id="gate">
+  <form class="gate-card" id="gateForm" autocomplete="off">
+    <div class="gate-icon">✦</div>
+    <h1>Celestial Birth Chart</h1>
+    <p>Enter your 4-digit access PIN to continue</p>
+    <div class="pin" id="pin">
+      <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="PIN digit 1" />
+      <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="PIN digit 2" />
+      <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="PIN digit 3" />
+      <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="PIN digit 4" />
+    </div>
+    <div class="gate-msg" id="gateMsg"></div>
+  </form>
+</div>
+<div id="scene"></div>
+<div id="labels"></div>
+
+<div class="panel" id="panel">
+  <h1>✦ Celestial <span>Birth Chart</span></h1>
+  <div class="sub">Planets, nodes &amp; fixed stars at the moment you were born. Drag to orbit · scroll to zoom · <b style="color:var(--accent)">click Earth</b> for a guided tour · click any planet for its meaning</div>
+
+  <div class="grid">
+    <label>Date of birth <input type="date" id="date" /></label>
+    <label>Time of birth <input type="time" id="time" step="60" /></label>
+    <label>Country of birth
+      <div class="combo">
+        <input type="text" id="countrySearch" autocomplete="off" spellcheck="false" placeholder="Loading…" disabled />
+        <div class="combo-list" id="countryList" role="listbox"></div>
+      </div>
+    </label>
+    <label>City of birth
+      <div class="combo">
+        <input type="text" id="citySearch" autocomplete="off" spellcheck="false" placeholder="Loading…" disabled />
+        <div class="combo-list" id="cityList" role="listbox"></div>
+      </div>
+    </label>
+    <div class="span2 coords" id="coordsLine">Pick your birth city to set location &amp; timezone automatically.</div>
+    <label class="span2">Timezone (auto-set from city) <span id="tzInfo" style="color:var(--accent)"></span>
+      <div class="combo">
+        <input type="text" id="tzSearch" autocomplete="off" spellcheck="false" placeholder="Search city, region, IST, +05:30…" />
+        <input type="hidden" id="tz" />
+        <div class="combo-list" id="tzList" role="listbox"></div>
+      </div>
+    </label>
+    <label class="span2">Zodiac
+      <select id="zodiac">
+        <option value="kp" selected>KP (Krishnamurti Paddhati)</option>
+        <option value="sidereal">Sidereal (Vedic · Lahiri)</option>
+      </select>
+    </label>
+    <details class="span2 manual" id="manualBox">
+      <summary>Or enter coordinates manually</summary>
+      <div class="grid">
+        <label>Latitude <input type="number" id="lat" step="0.0001" placeholder="e.g. 17.385" /></label>
+        <label>Longitude <input type="number" id="lon" step="0.0001" placeholder="e.g. 78.4867" /></label>
+      </div>
+    </details>
+  </div>
+  <div class="row">
+    <button id="calc">Reveal the sky ✦</button>
+    <button class="ghost" id="geo" title="Use this device's location">📍 My location</button>
+    <button class="ghost" id="now">Now</button>
+  </div>
+  <div class="toggles">
+    <label><input type="checkbox" id="tAspects" /> Aspects</label>
+    <label><input type="checkbox" id="tStars" /> Fixed stars</label>
+    <label><input type="checkbox" id="tNak" checked /> Nakshatras</label>
+    <label><input type="checkbox" id="tConst" checked /> Constellations</label>
+    <label><input type="checkbox" id="tRays" checked /> Projection rays</label>
+    <label><input type="checkbox" id="tRotate" /> Auto-rotate</label>
+  </div>
+
+  <h2 id="placementsTitle">Placements</h2>
+  <table id="table"></table>
+
+  <h2>Major aspects</h2>
+  <div class="aspects" id="aspects"></div>
+
+  <div class="note">
+    Calculated in-browser from orbital elements (JPL/Standish) and a truncated lunar theory (Meeus).
+    Planet accuracy is about 1′ to 2′ and the Moon is within about 0.1°. That's fine for sign and degree placement, not for precise timing work.
+    Nakshatras &amp; padas use the selected ayanamsa (Lahiri, or Krishnamurti in KP mode). In KP mode each placement also shows its sign lord · star lord · sub lord. Houses use the whole-sign system and need your birth city. City data: GeoNames (CC BY 4.0). North Node shown is the <em>true</em> node.
+  </div>
+</div>
+
+<div class="panel profile" id="profile">
+  <button class="pf-hide" id="pfHide" title="Hide profile">⟩</button>
+  <div class="pf-top">
+    <button type="button" class="pf-share" id="pfShare" title="Share your cosmic profile as an image">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
+      Share
+    </button>
+    <div class="pf-mode" role="group" aria-label="Profile detail level">
+      <button type="button" data-mode="simple">Simple</button><button type="button" data-mode="detailed">Detailed</button>
+    </div>
+  </div>
+  <h1>✦ Your Cosmic <span>Profile</span></h1>
+  <div class="sub" id="pfSub">A synthesis of your whole chart</div>
+  <div class="pf-tabs" role="tablist">
+    <button type="button" role="tab" data-tab="overall">Overall</button><button type="button" role="tab" data-tab="today">As of today</button>
+  </div>
+  <div id="profileBody"></div>
+</div>
+<div class="share-modal" id="shareModal" hidden>
+  <div class="share-card">
+    <img id="shareImg" alt="Your cosmic profile card" />
+    <div class="share-actions">
+      <a class="btn" id="shareDl" download="my-cosmic-profile.png">⤓ Download</a>
+      <button type="button" class="ghost" id="shareCopy">Copy image</button>
+      <button type="button" class="ghost" id="shareClose">Close</button>
+    </div>
+    <div class="share-hint">Download the image, then post it to Instagram, WhatsApp or anywhere you like.</div>
+  </div>
+</div>
+<button class="ghost profile-toggle" id="pfShow">✦ Profile ⟨</button>
+<div class="hint" id="hint"><span class="desk">✦ Click <b>Earth</b> to begin your guided journey · click any planet to read its influence</span><span class="mob">✦ Tap <b>Earth</b> for a tour · tap a planet</span></div>
+<div class="popup" id="popup"><button class="close" id="popupClose">×</button><div id="popupBody"></div></div>
+<div class="tour" id="tour">
+  <div class="tour-body" id="tourBody"></div>
+  <div class="tour-progress"><div id="tourBar"></div></div>
+  <div class="tour-nav">
+    <div class="tour-dots" id="tourDots"></div>
+    <div class="tour-btns">
+      <button class="ghost" id="tourPrev">‹ Prev</button>
+      <button class="ghost" id="tourPause">❚❚ Pause</button>
+      <button class="ghost" id="tourNext">Next ›</button>
+      <button id="tourExit">Exit ✕</button>
+    </div>
+  </div>
+</div>
+<nav class="tabbar" id="tabbar">
+  <button data-sheet="panel"><span>✦</span>Birth chart</button>
+  <button data-sheet="profile"><span>☉</span>Profile</button>
+  <button data-act="tour"><span>⊕</span>Tour</button>
+  <button data-act="sky" class="on"><span>✧</span>Sky</button>
+</nav>
+<div class="legend" id="legend">
+  <i style="background:#f5c66b"></i>Conjunction
+  <i style="background:#5fb3ff"></i>Trine
+  <i style="background:#6fe0a8"></i>Sextile
+  <i style="background:#ff6b6b"></i>Square
+  <i style="background:#ff9f43"></i>Opposition
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+/* ============================================================
+   ASTRONOMY
+   ============================================================ */
+const D2R = Math.PI / 180, R2D = 180 / Math.PI;
+const norm = a => ((a % 360) + 360) % 360;
+const sinD = a => Math.sin(a * D2R), cosD = a => Math.cos(a * D2R);
+
+// JPL Keplerian elements, valid 1800–2050 (a, e, I, L, varpi, Omega) + rates per century
+const ELEMENTS = {
+  mercury: [[0.38709927, 0.20563593, 7.00497902, 252.25032350, 77.45779628, 48.33076593],
+            [0.00000037, 0.00001906, -0.00594749, 149472.67411175, 0.16047689, -0.12534081]],
+  venus:   [[0.72333566, 0.00677672, 3.39467605, 181.97909950, 131.60246718, 76.67984255],
+            [0.00000390, -0.00004107, -0.00078890, 58517.81538729, 0.00268329, -0.27769418]],
+  earth:   [[1.00000261, 0.01671123, -0.00001531, 100.46457166, 102.93768193, 0.0],
+            [0.00000562, -0.00004392, -0.01294668, 35999.37244981, 0.32327364, 0.0]],
+  mars:    [[1.52371034, 0.09339410, 1.84969142, -4.55343205, -23.94362959, 49.55953891],
+            [0.00001847, 0.00007882, -0.00813131, 19140.30268499, 0.44441088, -0.29257343]],
+  jupiter: [[5.20288700, 0.04838624, 1.30439695, 34.39644051, 14.72847983, 100.47390909],
+            [-0.00011607, -0.00013253, -0.00183714, 3034.74612775, 0.21252668, 0.20469106]],
+  saturn:  [[9.53667594, 0.05386179, 2.48599187, 49.95424423, 92.59887831, 113.66242448],
+            [-0.00125060, -0.00050991, 0.00193609, 1222.49362201, -0.41897216, -0.28867794]],
+  uranus:  [[19.18916464, 0.04725744, 0.77263783, 313.23810451, 170.95427630, 74.01692503],
+            [-0.00196176, -0.00004397, -0.00242939, 428.48202785, 0.40805281, 0.04240589]],
+  neptune: [[30.06992276, 0.00859048, 1.77004347, -55.12002969, 44.96476227, 131.78422574],
+            [0.00026291, 0.00005105, 0.00035372, 218.45945325, -0.32241464, -0.00508664]],
+  pluto:   [[39.48211675, 0.24882730, 17.14001206, 238.92903833, 224.06891629, 110.30393684],
+            [-0.00031596, 0.00005170, 0.00004818, 145.20780515, -0.04062942, -0.01183482]],
+};
+
+function helio(name, T) {
+  const [e0, r] = ELEMENTS[name];
+  const a = e0[0] + r[0] * T, e = e0[1] + r[1] * T, I = e0[2] + r[2] * T;
+  const L = e0[3] + r[3] * T, wb = e0[4] + r[4] * T, O = e0[5] + r[5] * T;
+  const w = wb - O;
+  const M = norm(L - wb) * D2R;
+  let E = M + e * Math.sin(M);
+  for (let i = 0; i < 12; i++) E -= (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+  const xp = a * (Math.cos(E) - e), yp = a * Math.sqrt(1 - e * e) * Math.sin(E);
+  const cw = cosD(w), sw = sinD(w), cO = cosD(O), sO = sinD(O), cI = cosD(I), sI = sinD(I);
+  return {
+    x: (cw * cO - sw * sO * cI) * xp + (-sw * cO - cw * sO * cI) * yp,
+    y: (cw * sO + sw * cO * cI) * xp + (-sw * sO + cw * cO * cI) * yp,
+    z: (sw * sI) * xp + (cw * sI) * yp,
+  };
+}
+
+function moonPos(T) {
+  const Lp = 218.3164477 + 481267.88123421 * T;
+  const D = 297.8501921 + 445267.1114034 * T;
+  const M = 357.5291092 + 35999.0502909 * T;
+  const Mp = 134.9633964 + 477198.8675055 * T;
+  const F = 93.2720950 + 483202.0175233 * T;
+  const E = 1 - 0.002516 * T;
+  const lonTerms = [
+    [6288774, 0, 0, 1, 0], [1274027, 2, 0, -1, 0], [658314, 2, 0, 0, 0], [213618, 0, 0, 2, 0],
+    [-185116, 0, 1, 0, 0], [-114332, 0, 0, 0, 2], [58793, 2, 0, -2, 0], [57066, 2, -1, -1, 0],
+    [53322, 2, 0, 1, 0], [45758, 2, -1, 0, 0], [-40923, 0, 1, -1, 0], [-34720, 1, 0, 0, 0],
+    [-30383, 0, 1, 1, 0], [15327, 2, 0, 0, -2], [-12528, 0, 0, 1, 2], [10980, 0, 0, 1, -2],
+    [10675, 4, 0, -1, 0], [10034, 0, 0, 3, 0], [8548, 4, 0, -2, 0], [-7888, 2, 1, -1, 0],
+    [-6766, 2, 1, 0, 0], [-5163, 1, 0, -1, 0], [4987, 1, 1, 0, 0], [4036, 2, -1, 1, 0],
+    [3994, 2, 0, 2, 0], [3861, 4, 0, 0, 0], [3665, 2, 0, -3, 0], [-2689, 0, 1, -2, 0],
+  ];
+  const latTerms = [
+    [5128122, 0, 0, 0, 1], [280602, 0, 0, 1, 1], [277693, 0, 0, 1, -1], [173237, 2, 0, 0, -1],
+    [55413, 2, 0, -1, 1], [46271, 2, 0, -1, -1], [32573, 2, 0, 0, 1], [17198, 0, 0, 2, 1],
+  ];
+  const sum = (terms, fn) => terms.reduce((s, [c, d, m, mp, f]) => {
+    const ef = Math.abs(m) === 1 ? E : Math.abs(m) === 2 ? E * E : 1;
+    return s + c * ef * fn(d * D + m * M + mp * Mp + f * F);
+  }, 0);
+  return {
+    lon: norm(Lp + sum(lonTerms, sinD) / 1e6),
+    lat: sum(latTerms, sinD) / 1e6,
+    D, M, Mp, F,
+  };
+}
+
+const PRECESSION = 1.3969713; // deg / century, J2000 ecliptic -> ecliptic of date
+
+function computeAll(jd) {
+  const T = (jd - 2451545.0) / 36525;
+  const prec = PRECESSION * T;
+  const earth = helio('earth', T);
+  const out = {};
+  out.sun = { lon: norm(Math.atan2(-earth.y, -earth.x) * R2D + prec), lat: 0 };
+  const m = moonPos(T);
+  out.moon = { lon: m.lon, lat: m.lat };
+  for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto']) {
+    const h = helio(p, T);
+    const x = h.x - earth.x, y = h.y - earth.y, z = h.z - earth.z;
+    out[p] = { lon: norm(Math.atan2(y, x) * R2D + prec), lat: Math.atan2(z, Math.hypot(x, y)) * R2D };
+  }
+  // True lunar node
+  const meanNode = 125.0445479 - 1934.1362891 * T + 0.0020754 * T * T;
+  const trueNode = meanNode
+    - 1.4979 * sinD(2 * (m.D - m.F)) - 0.1500 * sinD(m.M) - 0.1226 * sinD(2 * m.D)
+    + 0.1176 * sinD(2 * m.F) - 0.0801 * sinD(2 * (m.Mp - m.F));
+  out.northNode = { lon: norm(trueNode), lat: 0 };
+  out.southNode = { lon: norm(trueNode + 180), lat: 0 };
+  return out;
+}
+
+function angles(jd, latDeg, lonDeg) {
+  const T = (jd - 2451545.0) / 36525;
+  const gmst = norm(280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T);
+  const ramc = norm(gmst + lonDeg);
+  const eps = 23.4392911 - 0.0130042 * T;
+  const mc = norm(Math.atan2(sinD(ramc), cosD(ramc) * cosD(eps)) * R2D);
+  const asc = norm(Math.atan2(cosD(ramc), -(sinD(ramc) * cosD(eps) + Math.tan(latDeg * D2R) * sinD(eps))) * R2D);
+  return { asc, mc };
+}
+
+const lahiri = jd => 23.853 + PRECESSION * ((jd - 2451545.0) / 36525);
+// KP (Krishnamurti) ayanamsa runs ≈ 5′54″ behind Lahiri
+const kpAyanamsa = jd => lahiri(jd) - 0.0983;
+
+/* ============================================================
+   DATA: bodies, signs, stars
+   ============================================================ */
+const VS = '︎'; // force text glyphs (not emoji)
+const SIGNS = [
+  ['Aries', '♈', 'fire'], ['Taurus', '♉', 'earth'], ['Gemini', '♊', 'air'], ['Cancer', '♋', 'water'],
+  ['Leo', '♌', 'fire'], ['Virgo', '♍', 'earth'], ['Libra', '♎', 'air'], ['Scorpio', '♏', 'water'],
+  ['Sagittarius', '♐', 'fire'], ['Capricorn', '♑', 'earth'], ['Aquarius', '♒', 'air'], ['Pisces', '♓', 'water'],
+];
+const ELEMENT_COLOR = { fire: 0xff7a59, earth: 0x7bd88f, air: 0xf2e27a, water: 0x5fa8ff };
+// [name, deity, symbol, gana, essence (" ... through X"), behaviour]
+const NAK_INFO = [
+  ['Ashwini', 'the Ashwini Kumaras (divine healers)', 'a horse’s head', 'Deva', 'swift initiative, healing and youthful courage', 'Quick to start and quick to help, this energy acts fast, heals and rescues, and loves being first, though it can be impatient to finish.'],
+  ['Bharani', 'Yama (lord of dharma and death)', 'the yoni (womb)', 'Manushya', 'intensity, restraint and the power to bear and create', 'It carries heavy experiences and transforms them. It is passionate and creative but must learn self-control, and it feels life’s extremes of birth, death and moral choice deeply.'],
+  ['Krittika', 'Agni (fire)', 'a razor or flame', 'Rakshasa', 'sharp discernment, purification and protective fire', 'Cutting through illusion, it is honest, direct and principled. It nourishes like a mother while burning away what is false, and can be critical or fiery when provoked.'],
+  ['Rohini', 'Brahma (the creator)', 'an ox cart or chariot', 'Manushya', 'beauty, fertility, charm and steady growth', 'It is magnetic, artistic and sensual, and makes things grow and flourish. It loves comfort and abundance, and must watch for possessiveness or over-attachment.'],
+  ['Mrigashira', 'Soma (the Moon god)', 'a deer’s head', 'Deva', 'curiosity, gentle searching and restless exploration', 'Ever seeking the next thing, it is inquisitive, sensitive and charming, gathering knowledge and experiences, though it can be unsettled or suspicious.'],
+  ['Ardra', 'Rudra (the storm god)', 'a teardrop or diamond', 'Manushya', 'storms of transformation, intellect and emotional honesty', 'Growth comes through upheaval. It is mentally sharp, truth-seeking and research-minded, and after the storm it clears the air and brings renewal.'],
+  ['Punarvasu', 'Aditi (mother of the gods)', 'a quiver of arrows', 'Deva', 'renewal, optimism and the return of light', 'Resilient and generous, it always bounces back. It values home, simplicity and faith, and restores what was lost with an expansive, forgiving heart.'],
+  ['Pushya', 'Brihaspati (guru of the gods)', 'a cow’s udder or lotus', 'Deva', 'nourishment, devotion and protective care', 'It is the most auspicious nakshatra: nurturing, disciplined, spiritual and supportive. It cares for others and upholds tradition, though it can be rigid or over-protective.'],
+  ['Ashlesha', 'the Nagas (serpent deities)', 'a coiled serpent', 'Rakshasa', 'hypnotic insight, kundalini power and entwining intensity', 'Perceptive and strategic, it understands hidden motives and can captivate others. Used wisely this is deep healing wisdom; unchecked it becomes secrecy or manipulation.'],
+  ['Magha', 'the Pitris (ancestors)', 'a royal throne', 'Rakshasa', 'ancestral power, dignity and natural authority', 'Regal and proud of its lineage, it seeks honour and leadership and respects tradition. It carries ancestral karma, so it must avoid arrogance or entitlement.'],
+  ['Purva Phalguni', 'Bhaga (god of delight)', 'the front legs of a bed', 'Manushya', 'pleasure, romance, rest and creative joy', 'Warm, playful and affectionate, it loves art, luxury and celebration. It brings people together joyfully, but must balance enjoyment with effort.'],
+  ['Uttara Phalguni', 'Aryaman (god of contracts and patronage)', 'the back legs of a bed', 'Manushya', 'loyalty, generosity and committed partnership', 'Dependable and kind, it honours agreements and helps friends rise. It is a natural patron and leader whose strength lies in steady, honourable service.'],
+  ['Hasta', 'Savitar (the creative Sun)', 'an open hand', 'Deva', 'skill, dexterity and the power to manifest', 'Clever with hands and words, it is resourceful, witty and practical. It can grasp exactly what it wants and craft it into being, and must watch for over-control or anxiety.'],
+  ['Chitra', 'Tvashtar / Vishvakarma (the cosmic architect)', 'a bright jewel', 'Rakshasa', 'brilliance, design and dazzling charisma', 'Artistic and image-conscious, it creates beautiful structures in art, architecture, style or ideas. It wants to shine and be admired, and is driven by aesthetic perfection.'],
+  ['Swati', 'Vayu (the wind)', 'a young sprout swaying in the wind', 'Deva', 'independence, flexibility and self-made success', 'Free-spirited and diplomatic, it adapts to any wind and grows its own way. It has a talent for trade and negotiation, but needs roots to avoid restlessness.'],
+  ['Vishakha', 'Indra-Agni (power and fire)', 'a triumphal archway', 'Rakshasa', 'single-minded ambition and goal-driven determination', 'Once it sets a goal it pursues it relentlessly and achieves greatly. It must take care that the end does not justify every means, and that success is shared.'],
+  ['Anuradha', 'Mitra (god of friendship)', 'a lotus', 'Deva', 'devotion, friendship and cooperation', 'Loyal and organised, it blooms like a lotus even in difficult conditions. It builds networks and succeeds through teamwork, often far from home.'],
+  ['Jyeshtha', 'Indra (king of the gods)', 'a circular earring or umbrella', 'Rakshasa', 'seniority, protection and hard-won power', 'It carries the weight of the eldest: responsible, courageous and protective of others. It must handle power with humility and avoid jealousy or isolation.'],
+  ['Mula', 'Nirriti (goddess of dissolution)', 'a bunch of tied roots', 'Rakshasa', 'getting to the root, dissolution and radical truth', 'An investigator and seeker, it tears things down to find the truth beneath. Life may bring sudden losses that lead to profound spiritual freedom.'],
+  ['Purva Ashadha', 'Apas (the cosmic waters)', 'a winnowing fan', 'Manushya', 'invincibility, conviction and purification', 'Confident and persuasive, it believes in its cause and can win others over. It purifies like water, and must avoid stubbornness or overconfidence.'],
+  ['Uttara Ashadha', 'the Vishvadevas (universal gods)', 'an elephant’s tusk', 'Manushya', 'final, lasting victory through integrity', 'Principled, patient and responsible, it wins slowly but permanently. It is a leader whose authority rests on ethics and endurance.'],
+  ['Shravana', 'Vishnu (the preserver)', 'an ear and three footprints', 'Deva', 'listening, learning and connecting people to wisdom', 'It learns by listening, preserves knowledge and shares it. It is a natural teacher and connector, sensitive to what others say about it.'],
+  ['Dhanishta', 'the eight Vasus (gods of abundance)', 'a drum', 'Rakshasa', 'rhythm, prosperity, music and fame', 'Ambitious, generous and in tune with timing, it attracts wealth and recognition. It loves music and group endeavours, but can feel hollow without inner meaning.'],
+  ['Shatabhisha', 'Varuna (god of the cosmic waters)', 'an empty circle of a hundred stars', 'Rakshasa', 'healing, mystery and solitary insight', 'It is a secretive healer and scientist of the unseen, philosophical, independent and truth-loving. It may feel apart from others while working for the collective good.'],
+  ['Purva Bhadrapada', 'Aja Ekapada (the one-footed fire serpent)', 'a sword or the front of a funeral cot', 'Manushya', 'fiery idealism, intensity and transformation', 'Passionate and visionary, it will sacrifice comfort for a higher cause. It has two sides, the saint and the extremist, and must channel its intensity wisely.'],
+  ['Uttara Bhadrapada', 'Ahir Budhnya (serpent of the deep)', 'the back legs of a funeral cot', 'Manushya', 'depth, wisdom, restraint and compassion', 'Calm, disciplined and deeply wise, it controls its emotions and serves quietly. It holds great inner strength and finds its power in stillness and meditation.'],
+  ['Revati', 'Pushan (the nourisher and guide)', 'a fish or drum', 'Deva', 'compassion, guidance and safe completion', 'Gentle, imaginative and kind, it protects travellers and lost souls and brings things to a graceful completion. It is spiritually sensitive and needs to guard its boundaries.'],
+];
+const NAK_LORDS = ['Ketu', 'Venus', 'Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Saturn', 'Mercury'];
+const LORD_KEY = { Ketu: 'southNode', Rahu: 'northNode', Sun: 'sun', Moon: 'moon', Mars: 'mars', Mercury: 'mercury', Jupiter: 'jupiter', Venus: 'venus', Saturn: 'saturn' };
+const GANA_COLOR = { Deva: 0xf5c66b, Manushya: 0x6fd6c8, Rakshasa: 0xff6b8a };
+// Pada n always maps to a navamsa of element fire/earth/air/water -> Dharma/Artha/Kama/Moksha
+const PADA_INFO = [
+  { name: 'Dharma', color: 0xff7a59, focus: 'purpose, principle and right action',
+    text: 'In a Dharma pada the energy seeks meaning and integrity. It wants to act on what is right, lead by example and live by a personal code. It is motivated by purpose and duty rather than reward, and it feels most fulfilled when its actions express who it truly is.' },
+  { name: 'Artha', color: 0x7bd88f, focus: 'material security, resources and practical achievement',
+    text: 'In an Artha pada the energy turns practical. It wants tangible results, skill, wealth and stability, and the means to support a good life. It is motivated by building something real and lasting, and it judges success by what it can create and sustain.' },
+  { name: 'Kama', color: 0x5fb3ff, focus: 'desire, relationships and creative enjoyment',
+    text: 'In a Kama pada the energy becomes relational and expressive. It seeks connection, pleasure, communication and the fulfilment of desire. It is motivated by what the heart wants and who it shares it with, so relationships become the stage where this planet plays out.' },
+  { name: 'Moksha', color: 0xc58cff, focus: 'liberation, emotional depth and spiritual release',
+    text: 'In a Moksha pada the energy turns inward and transcendent. It seeks emotional truth, letting go and spiritual freedom. It is motivated by the soul’s longing for liberation more than worldly gain, so this planet often matures through surrender, intuition and inner work.' },
+];
+const NAK_SPAN = 360 / 27, PADA_SPAN = NAK_SPAN / 4;
+const shortNak = n => n.replace('Purva ', 'P.').replace('Uttara ', 'U.');
+function nakOf(slon) {
+  const n = Math.floor(slon / NAK_SPAN) % 27;
+  const gp = Math.floor(slon / PADA_SPAN) % 108;
+  return { n, pada: (gp % 4) + 1, nav: gp % 12, lord: NAK_LORDS[n % 9] };
+}
+// --- KP: sign lord / star lord / sub lord. Each nakshatra splits into 9 subs proportional to
+// Vimshottari years, starting from the nakshatra's own lord.
+const VIM_YEARS = { Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17 };
+const SIGN_LORDS = ['Mars', 'Venus', 'Mercury', 'Moon', 'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Saturn', 'Jupiter'];
+const LORD_ABBR = { Sun: 'Su', Moon: 'Mo', Mars: 'Ma', Mercury: 'Me', Jupiter: 'Ju', Venus: 'Ve', Saturn: 'Sa', Rahu: 'Ra', Ketu: 'Ke' };
+function kpLords(slon) {
+  const n = Math.floor(slon / NAK_SPAN) % 27;
+  let into = slon - n * NAK_SPAN, i = n % 9;
+  for (let k = 0; k < 9; k++, i = (i + 1) % 9) {
+    const span = NAK_SPAN * VIM_YEARS[NAK_LORDS[i]] / 120;
+    if (into < span || k === 8) break;
+    into -= span;
+  }
+  return { sign: SIGN_LORDS[Math.floor(slon / 30) % 12], star: NAK_LORDS[n % 9], sub: NAK_LORDS[i] };
+}
+const kpText = l => `${LORD_ABBR[l.sign]}·${LORD_ABBR[l.star]}·${LORD_ABBR[l.sub]}`;
+const kpTitle = l => `Sign lord ${l.sign} · Star lord ${l.star} · Sub lord ${l.sub}`;
+const NAKSHATRAS = ['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha',
+  'Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha',
+  'Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
+
+// radius = display orbit radius in the 3D scene
+const BODIES = [
+  { key: 'sun',       name: 'Sun',        glyph: '☉', color: 0xffd36b, size: 0.95, r: 7.0 },
+  { key: 'moon',      name: 'Moon',       glyph: '☽', color: 0xdfe6f5, size: 0.42, r: 3.4 },
+  { key: 'mercury',   name: 'Mercury',    glyph: '☿', color: 0xb9b2a8, size: 0.32, r: 4.6 },
+  { key: 'venus',     name: 'Venus',      glyph: '♀', color: 0xf3d9a4, size: 0.42, r: 5.8 },
+  { key: 'mars',      name: 'Mars',       glyph: '♂', color: 0xe0623f, size: 0.38, r: 8.2 },
+  { key: 'jupiter',   name: 'Jupiter',    glyph: '♃', color: 0xd9b48a, size: 0.75, r: 9.4 },
+  { key: 'saturn',    name: 'Saturn',     glyph: '♄', color: 0xe8d39a, size: 0.65, r: 10.6, ring: true },
+  { key: 'uranus',    name: 'Uranus',     glyph: '♅', color: 0x9fe3ea, size: 0.5, r: 11.7 },
+  { key: 'neptune',   name: 'Neptune',    glyph: '♆', color: 0x5b7cff, size: 0.5, r: 12.7 },
+  { key: 'pluto',     name: 'Pluto',      glyph: '♇', color: 0xc7a08a, size: 0.25, r: 13.6 },
+  { key: 'northNode', name: 'North Node', glyph: '☊', color: 0xc58cff, size: 0.28, r: 3.4, node: true },
+  { key: 'southNode', name: 'South Node', glyph: '☋', color: 0x8c6bd6, size: 0.28, r: 3.4, node: true },
+];
+const NAK_IN = 17.8, NAK_MID = 18.35, NAK_OUT = 21.0;   // nakshatra ring outside (pada strip on its inner edge)
+const ZODIAC_IN = 14.5, ZODIAC_OUT = 17.2, STAR_R = 27;  // rasi ring inside
+
+// Bright / astrologically significant fixed stars — J2000 ecliptic lon, lat, magnitude
+const STARS = [
+  ['Aldebaran', 69.79, -5.47, 0.9], ['Regulus', 149.83, 0.46, 1.4], ['Spica', 203.84, -2.05, 1.0],
+  ['Antares', 249.76, -4.57, 1.0], ['Fomalhaut', 333.87, -21.13, 1.2], ['Sirius', 104.08, -39.6, -1.5],
+  ['Algol', 56.17, 22.43, 2.1], ['Alcyone (Pleiades)', 60.0, 4.05, 2.9], ['Betelgeuse', 88.75, -16.03, 0.5],
+  ['Rigel', 76.83, -31.12, 0.1], ['Pollux', 113.22, 6.68, 1.1], ['Castor', 110.23, 10.1, 1.6],
+  ['Procyon', 115.79, -16.0, 0.4], ['Vega', 285.32, 61.73, 0.0], ['Arcturus', 204.23, 30.73, -0.1],
+  ['Polaris', 88.57, 66.1, 2.0], ['Altair', 301.78, 29.3, 0.8], ['Capella', 81.85, 22.86, 0.1],
+  ['Canopus', 104.97, -75.8, -0.7], ['Achernar', 345.3, -59.4, 0.5], ['Deneb', 335.3, 59.9, 1.3],
+  ['Alphecca', 222.3, 44.3, 2.2], ['Zuben Elgenubi', 225.1, 0.3, 2.8], ['Vindemiatrix', 189.9, 16.2, 2.8],
+];
+
+/* ---------- Interpretations ---------- */
+const PLANET_INFO = {
+  sun: { keys: ['Identity', 'Vitality', 'Purpose', 'Ego', 'Father'],
+    core: 'The Sun is your core self: the conscious identity you are growing into, your vitality, creative will and the light you are here to shine. It shows what makes you feel most alive and how you seek recognition.',
+    lead: 'Your core identity and life force shine' },
+  moon: { keys: ['Emotions', 'Instinct', 'Comfort', 'Mother', 'Memory'],
+    core: 'The Moon governs your emotional body, instincts, habits and what makes you feel safe. It reveals how you nurture and need to be nurtured, and the private self only those close to you see. In Vedic astrology it is as important as the Sun.',
+    lead: 'Your emotions and need for security express themselves' },
+  mercury: { keys: ['Mind', 'Communication', 'Learning', 'Logic', 'Siblings'],
+    core: 'Mercury is the messenger: how you think, learn, speak, write and process information. It shapes your curiosity, wit, and the way you connect ideas and people.',
+    lead: 'Your mind thinks and communicates',
+    retro: 'Born with Mercury retrograde, you often have a reflective, inward-processing mind. You rethink, revise and notice what others miss, and you may prefer to think deeply before speaking.' },
+  venus: { keys: ['Love', 'Beauty', 'Values', 'Pleasure', 'Money'],
+    core: 'Venus rules love, attraction, beauty, art and what you value, including money. It shows how you give and receive affection, your aesthetic taste and what brings you pleasure.',
+    lead: 'You love, attract and appreciate beauty',
+    retro: 'Venus retrograde suggests deeply re-examined, individual values in love. Relationships can feel karmic, and true self-worth is built from within rather than through others.' },
+  mars: { keys: ['Drive', 'Courage', 'Desire', 'Action', 'Conflict'],
+    core: 'Mars is your engine: drive, ambition, courage, passion and how you fight for what you want. It shows how you take action, handle anger and compete.',
+    lead: 'You act, assert yourself and chase your desires',
+    retro: 'Mars retrograde turns drive inward: strategic, deliberate action, with anger processed internally before it is expressed. Your strength often shows in persistence rather than force.' },
+  jupiter: { keys: ['Growth', 'Luck', 'Wisdom', 'Faith', 'Abundance'],
+    core: 'Jupiter, the great benefic, expands whatever it touches. It shows where you find luck, meaning, optimism and opportunity, and how you grow through teachers, travel and philosophy.',
+    lead: 'You grow, attract luck and seek meaning',
+    retro: 'Jupiter retrograde gives an inner-sourced philosophy: wisdom found through personal experience rather than received doctrine.' },
+  saturn: { keys: ['Discipline', 'Structure', 'Karma', 'Time', 'Mastery'],
+    core: 'Saturn is the teacher and taskmaster. It marks where you face tests, delays and responsibility, and where patience and effort let you build lasting mastery and authority. Its rewards come later in life.',
+    lead: 'You meet life’s lessons and build discipline',
+    retro: 'Saturn retrograde internalises authority. You are often your own strictest critic, and mastery comes from standards you define for yourself.' },
+  uranus: { keys: ['Freedom', 'Innovation', 'Rebellion', 'Awakening', 'Change'],
+    core: 'Uranus is the awakener: sudden change, originality, genius and rebellion. Because it moves slowly, its sign describes your whole generation; its house shows where you personally break the mould.',
+    lead: 'You rebel, innovate and seek freedom',
+    retro: 'Uranus retrograde turns revolution inward, bringing personal awakenings and an unconventional inner freedom.' },
+  neptune: { keys: ['Dreams', 'Intuition', 'Spirituality', 'Imagination', 'Illusion'],
+    core: 'Neptune dissolves boundaries. It governs dreams, compassion, intuition, art and spirituality, as well as illusion and escapism. Its house shows where life asks you to trust the unseen.',
+    lead: 'You dream, imagine and seek transcendence',
+    retro: 'Neptune retrograde deepens private spirituality and gives a strong inner world of imagination and intuition.' },
+  pluto: { keys: ['Transformation', 'Power', 'Rebirth', 'Depth', 'Shadow'],
+    core: 'Pluto rules death and rebirth, power, obsession and hidden depths. It shows where you undergo profound transformation and where you hold deep, regenerative power.',
+    lead: 'You transform, reclaim power and confront the depths',
+    retro: 'Pluto retrograde points to inner transformation: you regenerate quietly, from the inside out.' },
+  northNode: { keys: ['Destiny', 'Soul growth', 'Rahu', 'Future'],
+    core: 'The North Node (Rahu in Vedic astrology) points to your soul’s direction of growth in this life. It is unfamiliar territory that feels uncomfortable at first but brings fulfilment and evolution as you lean into it.',
+    lead: 'Your soul grows by learning to live' },
+  southNode: { keys: ['Past karma', 'Innate gifts', 'Ketu', 'Release'],
+    core: 'The South Node (Ketu) shows the talents and patterns you bring in from the past. These gifts feel natural and easy but can become a comfort zone. Use them in service of your North Node rather than hiding in them.',
+    lead: 'You arrive with innate mastery, naturally living' },
+};
+const SIGN_INFO = [
+  { mod: 'Cardinal', ruler: 'Mars', how: 'boldly and directly: pioneering, courageous, competitive and eager to be first' },
+  { mod: 'Fixed', ruler: 'Venus', how: 'steadily and sensually: grounded, loyal, patient and seeking comfort and security' },
+  { mod: 'Mutable', ruler: 'Mercury', how: 'curiously and playfully: quick-witted, versatile, social and hungry for variety' },
+  { mod: 'Cardinal', ruler: 'Moon', how: 'tenderly and protectively: intuitive, nurturing, sensitive and rooted in home and family' },
+  { mod: 'Fixed', ruler: 'Sun', how: 'radiantly and generously: warm, creative, proud and wanting to be seen and celebrated' },
+  { mod: 'Mutable', ruler: 'Mercury', how: 'carefully and thoughtfully: analytical, helpful, detail-minded and devoted to improvement' },
+  { mod: 'Cardinal', ruler: 'Venus', how: 'gracefully and diplomatically: fair, charming, partnership-minded and seeking balance' },
+  { mod: 'Fixed', ruler: 'Mars / Pluto', how: 'intensely and privately: passionate, perceptive, magnetic and all-or-nothing' },
+  { mod: 'Mutable', ruler: 'Jupiter', how: 'adventurously and optimistically: philosophical, freedom-loving, honest and expansive' },
+  { mod: 'Cardinal', ruler: 'Saturn', how: 'ambitiously and responsibly: disciplined, strategic, practical and built for the long game' },
+  { mod: 'Fixed', ruler: 'Saturn / Uranus', how: 'independently and inventively: progressive, humanitarian, unconventional and future-focused' },
+  { mod: 'Mutable', ruler: 'Jupiter / Neptune', how: 'compassionately and dreamily: empathic, imaginative, spiritual and boundary-dissolving' },
+];
+const HOUSE_INFO = [
+  ['Self & Identity', 'your body, personality, appearance and the first impression you make'],
+  ['Money & Values', 'your finances, possessions, talents and sense of self-worth'],
+  ['Mind & Communication', 'your everyday thinking, siblings, neighbours, short trips and early learning'],
+  ['Home & Roots', 'your home, family, ancestry and inner emotional foundation'],
+  ['Creativity & Romance', 'self-expression, romance, children, play and joy'],
+  ['Work & Health', 'daily routines, service, health and your work environment'],
+  ['Partnerships', 'marriage, close partnerships, contracts and open rivals'],
+  ['Transformation', 'intimacy, shared resources, inheritance, crisis and rebirth'],
+  ['Wisdom & Travel', 'higher learning, philosophy, faith, long journeys and publishing'],
+  ['Career & Legacy', 'career, public reputation, ambition and your life’s calling'],
+  ['Community & Dreams', 'friends, networks, groups and your hopes for the future'],
+  ['Spirit & the Unseen', 'solitude, the subconscious, spirituality, endings and hidden matters'],
+];
+// essential dignities (sign indices)
+const DIGNITY = {
+  sun: { dom: [4], ex: 0 }, moon: { dom: [3], ex: 1 }, mercury: { dom: [2, 5], ex: 5 }, venus: { dom: [1, 6], ex: 11 },
+  mars: { dom: [0, 7], ex: 9 }, jupiter: { dom: [8, 11], ex: 3 }, saturn: { dom: [9, 10], ex: 6 },
+};
+function dignityOf(key, sign) {
+  const d = DIGNITY[key]; if (!d) return null;
+  if (d.dom.includes(sign)) return ['Domicile', 'at home in this sign: its energy flows strongly and naturally'];
+  if (d.ex === sign) return ['Exalted', 'exalted here: its finest qualities are amplified'];
+  if (d.dom.some(x => (x + 6) % 12 === sign)) return ['Detriment', 'in detriment: it works through less familiar channels, which builds unusual skill'];
+  if ((d.ex + 6) % 12 === sign) return ['Fall', 'in fall: its expression takes conscious effort, and mastering it is a key life lesson'];
+  return null;
+}
+/* ---------- Personality synthesis data ---------- */
+const SIGN_TRAITS = [
+  [['bold', 'energetic', 'independent', 'courageous'], ['impatient', 'impulsive', 'quick-tempered']],
+  [['reliable', 'patient', 'sensual', 'grounded'], ['stubborn', 'possessive', 'resistant to change']],
+  [['witty', 'curious', 'adaptable', 'communicative'], ['restless', 'scattered', 'inconsistent']],
+  [['caring', 'intuitive', 'loyal', 'protective'], ['moody', 'over-sensitive', 'clinging to the past']],
+  [['confident', 'warm-hearted', 'creative', 'generous'], ['proud', 'attention-seeking', 'dramatic']],
+  [['analytical', 'helpful', 'precise', 'practical'], ['over-critical', 'anxious', 'perfectionist']],
+  [['charming', 'fair-minded', 'diplomatic', 'artistic'], ['indecisive', 'people-pleasing', 'conflict-avoidant']],
+  [['intense', 'perceptive', 'loyal', 'resilient'], ['secretive', 'controlling', 'slow to forgive']],
+  [['optimistic', 'adventurous', 'honest', 'philosophical'], ['tactless', 'restless', 'over-promising']],
+  [['ambitious', 'disciplined', 'responsible', 'strategic'], ['rigid', 'pessimistic', 'workaholic']],
+  [['original', 'humanitarian', 'independent', 'visionary'], ['detached', 'contrarian', 'emotionally aloof']],
+  [['compassionate', 'imaginative', 'intuitive', 'gentle'], ['escapist', 'easily overwhelmed', 'boundary-less']],
+];
+const ELEMENT_TEXT = {
+  fire: ['Fire', 0xff7a59, 'passionate, spontaneous and inspiring. You lead with enthusiasm and act on instinct', 'With little Fire, motivation may need conscious kindling; enthusiasm builds slowly.'],
+  earth: ['Earth', 0x7bd88f, 'grounded, practical and dependable. You trust what is real, build steadily and finish what you start', 'With little Earth, practical routines and finances may need deliberate attention.'],
+  air: ['Air', 0xf2e27a, 'intellectual, social and communicative. You process life through ideas, conversation and perspective', 'With little Air, stepping back to see things objectively may take effort.'],
+  water: ['Water', 0x5fa8ff, 'emotional, intuitive and empathic. You feel your way through life and read people deeply', 'With little Water, emotions may be under-expressed and you may need to learn to name your feelings.'],
+};
+const MODALITY_TEXT = {
+  Cardinal: [0xff9f43, 'an initiator: you start things, take charge and move toward goals'],
+  Fixed: [0xc58cff, 'a sustainer: you are persistent, loyal and determined to see things through'],
+  Mutable: [0x6fe0a8, 'an adapter: you are flexible, versatile and comfortable with change'],
+};
+const GANA_TEXT = {
+  Deva: 'a <b>Deva</b> (divine) temperament: gentle, generous, idealistic and drawn to harmony and virtue',
+  Manushya: 'a <b>Manushya</b> (human) temperament: balanced, ambitious and practical, mixing worldly drive with conscience',
+  Rakshasa: 'a <b>Rakshasa</b> (fierce) temperament: intense, fearless, independent and protective, with strong will and instincts',
+};
+const PURUSHARTHA_TEXT = {
+  Dharma: 'purpose, principle and living by what is right',
+  Artha: 'building security, skill and tangible achievement',
+  Kama: 'relationships, desire and creative fulfilment',
+  Moksha: 'inner freedom, emotional depth and spiritual growth',
+};
+const ASPECT_PHRASE = {
+  Conjunction: (a, b) => `fuses your ${a} with your ${b} into one powerful force`,
+  Trine: (a, b) => `lets your ${a} and ${b} flow together effortlessly, a natural gift`,
+  Sextile: (a, b) => `offers easy opportunities to combine ${a} and ${b}`,
+  Square: (a, b) => `creates productive friction between ${a} and ${b}, which drives growth through challenge`,
+  Opposition: (a, b) => `asks you to balance ${a} against ${b}, often mirrored through other people`,
+};
+const WEIGHT = { sun: 3, moon: 3, mercury: 2, venus: 2, mars: 2, jupiter: 1.5, saturn: 1.5, uranus: 0.5, neptune: 0.5, pluto: 0.5 };
+const ELEMENTS_ORDER = ['fire', 'earth', 'air', 'water'], MODS = ['Cardinal', 'Fixed', 'Mutable'];
+
+function renderProfile() {
+  if (!lastChart) return;
+  if (profileTab === 'today') {
+    $('profileBody').innerHTML = dashaView();
+    $('pfSub').textContent = `Born ${$('date').value} ${$('time').value} · ${placeLabel() || $('tz').value.replace(/_/g, ' ')}`;
+    $('profileBody').querySelectorAll('[data-key]').forEach(d => d.addEventListener('click', () => selectBody(d.dataset.key, true)));
+    return;
+  }
+  const { chart, found, ascZ, utcMs } = lastChart;
+  const sgn = key => fmtDeg(chart[key].zlon).sign;
+  const sunS = sgn('sun'), moonS = sgn('moon'), ascS = ascZ != null ? fmtDeg(ascZ).sign : null;
+  const T = i => SIGN_TRAITS[i];
+
+  // balances
+  const el = { fire: 0, earth: 0, air: 0, water: 0 }, mod = { Cardinal: 0, Fixed: 0, Mutable: 0 }, pur = { Dharma: 0, Artha: 0, Kama: 0, Moksha: 0 };
+  for (const [k, w] of Object.entries(WEIGHT)) {
+    const si = sgn(k);
+    el[SIGNS[si][2]] += w; mod[SIGN_INFO[si].mod] += w;
+    pur[PADA_INFO[chart[k].nak.pada - 1].name] += w;
+  }
+  if (ascS != null) { el[SIGNS[ascS][2]] += 3; mod[SIGN_INFO[ascS].mod] += 3; }
+  const pct = o => { const t = Object.values(o).reduce((a, b) => a + b, 0); return Object.fromEntries(Object.entries(o).map(([k, v]) => [k, Math.round(v / t * 100)])); };
+  const elP = pct(el), modP = pct(mod), purP = pct(pur);
+  const topOf = o => Object.entries(o).sort((a, b) => b[1] - a[1])[0][0];
+  const domEl = topOf(elP), domMod = topOf(modP), domPur = topOf(purP);
+  const lowEl = ELEMENTS_ORDER.filter(e => elP[e] < 10);
+
+  const moonNak = NAK_INFO[chart.moon.nak.n], gana = moonNak[3];
+  const nnS = sgn('northNode'), snS = sgn('southNode');
+
+  // ---- summary paragraph
+  let sum = `At your core you are <b>${T(sunS)[0][0]}</b> and <b>${T(sunS)[0][1]}</b> (Sun in ${SIGNS[sunS][0]}). Emotionally you are <b>${T(moonS)[0][moonS === sunS ? 2 : 0]}</b> and <b>${T(moonS)[0][moonS === sunS ? 3 : 2]}</b> (Moon in ${SIGNS[moonS][0]})`;
+  sum += ascS != null ? `, and others first meet you as <b>${T(ascS)[0][1]}</b> and <b>${T(ascS)[0][3]}</b> (${SIGNS[ascS][0]} rising). ` : '. ';
+  sum += `With <b>${ELEMENT_TEXT[domEl][0]}</b> as your strongest element you are ${ELEMENT_TEXT[domEl][2]}. Being mostly ${domMod.toLowerCase()} makes you ${MODALITY_TEXT[domMod][1]}. `;
+  sum += `Your Moon in <b>${moonNak[0]}</b> gives you ${GANA_TEXT[gana]}. Most of your planets sit in <b>${domPur}</b> padas, so you are driven above all by ${PURUSHARTHA_TEXT[domPur]}. `;
+  sum += `Your soul’s growth lies in developing ${SIGNS[nnS][0]} qualities (${T(nnS)[0].slice(0, 2).join(', ')}) while relying less on familiar ${SIGNS[snS][0]} patterns.`;
+
+  // ---- strengths
+  const strengths = [];
+  strengths.push(`<b>${cap(T(sunS)[0][2])} & ${T(sunS)[0][3]}</b>: your ${SIGNS[sunS][0]} Sun shines through how you act and lead.`);
+  if (moonS !== sunS) strengths.push(`<b>Emotional ${T(moonS)[0][1]}</b>: your ${SIGNS[moonS][0]} Moon helps you care for yourself and others.`);
+  for (const b of BODIES) {
+    if (b.node) continue;
+    const d = dignityOf(b.key, sgn(b.key));
+    if (d && (d[0] === 'Domicile' || d[0] === 'Exalted')) strengths.push(`<b>Strong ${b.name}</b> (${d[0].toLowerCase()} in ${SIGNS[sgn(b.key)][0]}): ${PLANET_INFO[b.key].keys.slice(0, 3).join(', ').toLowerCase()} come naturally.`);
+    const sidSign = Math.floor(chart[b.key].slon / 30);
+    if (['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn'].includes(b.key) && sidSign === chart[b.key].nak.nav)
+      strengths.push(`<b>Vargottama ${b.name}</b>: ${PLANET_INFO[b.key].keys[0].toLowerCase()} is consistent and reliable, inside and out.`);
+  }
+  const theme = k => PLANET_INFO[k].keys[0].toLowerCase();
+  const nm = k => BODIES.find(b => b.key === k).name;
+  found.filter(f => ['Trine', 'Sextile'].includes(f.asp.name) && f.orb < 4 && WEIGHT[f.a] >= 1.5 && WEIGHT[f.b] >= 1.5).slice(0, 2)
+    .forEach(f => strengths.push(`<b>${nm(f.a)} ${f.asp.name.toLowerCase()} ${nm(f.b)}</b> ${ASPECT_PHRASE[f.asp.name](theme(f.a), theme(f.b))}.`));
+
+  // ---- growth edges
+  const edges = [];
+  edges.push(`<b>${cap(T(sunS)[1][0])} or ${T(sunS)[1][1]}</b> when your ${SIGNS[sunS][0]} Sun is under stress.`);
+  if (moonS !== sunS) edges.push(`<b>${cap(T(moonS)[1][0])}</b> moods when emotional needs (${SIGNS[moonS][0]} Moon) go unmet.`);
+  for (const b of BODIES) {
+    if (b.node) continue;
+    const d = dignityOf(b.key, sgn(b.key));
+    if (d && (d[0] === 'Detriment' || d[0] === 'Fall')) edges.push(`<b>${b.name} in ${d[0].toLowerCase()}</b> (${SIGNS[sgn(b.key)][0]}): ${PLANET_INFO[b.key].keys.slice(0, 2).join(' and ').toLowerCase()} take conscious effort but become a hard-won skill.`);
+  }
+  found.filter(f => ['Square', 'Opposition'].includes(f.asp.name) && f.orb < 4 && WEIGHT[f.a] >= 1.5 && WEIGHT[f.b] >= 1.5).slice(0, 2)
+    .forEach(f => edges.push(`<b>${nm(f.a)} ${f.asp.name.toLowerCase()} ${nm(f.b)}</b> ${ASPECT_PHRASE[f.asp.name](theme(f.a), theme(f.b))}.`));
+  lowEl.forEach(e => edges.push(`<b>Low ${ELEMENT_TEXT[e][0]}</b>: ${ELEMENT_TEXT[e][3]}`));
+
+  // ---- keyword cloud
+  const words = new Map();
+  const add = (w, n = 1) => words.set(w, (words.get(w) || 0) + n);
+  T(sunS)[0].forEach(w => add(w, 2)); T(moonS)[0].slice(0, 3).forEach(w => add(w, 1.5));
+  if (ascS != null) T(ascS)[0].slice(0, 3).forEach(w => add(w, 1.5));
+  T(sgn('mercury'))[0].slice(0, 1).forEach(w => add(w)); T(sgn('venus'))[0].slice(0, 1).forEach(w => add(w)); T(sgn('mars'))[0].slice(0, 1).forEach(w => add(w));
+  const cloud = [...words.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14)
+    .map(([w, n]) => `<span class="${n >= 2 ? 'w2' : ''}">${w}</span>`).join('');
+
+  const bar = (label, v, color, top) => `<div class="bar${top ? ' top' : ''}"><span>${label}</span><div class="track"><div class="fill" style="width:${v}%;background:${hex(color)}"></div></div><span class="v">${v}%</span></div>`;
+  const b3 = (title, key, si, sub) => `<div ${key ? `data-key="${key}"` : ''}><div class="t">${title}</div><div class="s" style="color:${hex(ELEMENT_COLOR[SIGNS[si][2]])}">${SIGNS[si][1]}${VS}</div><div class="n">${SIGNS[si][0]}</div><div class="k">${sub}</div></div>`;
+
+  if (profileMode === 'simple') {
+    $('profileBody').innerHTML = simpleProfile({ T, sunS, moonS, ascS, nnS, snS, elP, modP, purP, domEl, domMod, domPur, lowEl, cloud, utcMs, bar, b3 });
+    $('pfSub').textContent = `Born ${$('date').value} ${$('time').value} · ${placeLabel() || $('tz').value.replace(/_/g, ' ')}`;
+    $('profileBody').querySelectorAll('.big3 [data-key]').forEach(d => d.addEventListener('click', () => selectBody(d.dataset.key, true)));
+    return;
+  }
+  $('profileBody').innerHTML = `
+    <h2>In a nutshell</h2>
+    <div class="pf-summary">${sum}</div>
+
+    <h2>The Big Three</h2>
+    <div class="big3">
+      ${b3('Sun · Self', 'sun', sunS, T(sunS)[0][0])}
+      ${b3('Moon · Heart', 'moon', moonS, NAK_INFO[chart.moon.nak.n][0])}
+      ${ascS != null ? b3('Rising · Mask', null, ascS, T(ascS)[0][1]) : '<div><div class="t">Rising · Mask</div><div class="s" style="color:var(--muted)">?</div><div class="k">pick birth city</div></div>'}
+    </div>
+
+    <h2>Life motivation · Pada purusharthas</h2>
+    <div class="bars">${PADA_INFO.map(p => bar(p.name, purP[p.name], p.color, p.name === domPur)).join('')}</div>
+    <p class="pf-text">Driven most by <b>${domPur}</b>: ${PURUSHARTHA_TEXT[domPur]}.</p>
+
+    <h2>Modality</h2>
+    <div class="bars">${MODS.map(m => bar(m, modP[m], MODALITY_TEXT[m][0], m === domMod)).join('')}</div>
+
+    <h2>Elemental balance</h2>
+    <div class="bars">${ELEMENTS_ORDER.map(e => bar(ELEMENT_TEXT[e][0], elP[e], ELEMENT_TEXT[e][1], e === domEl)).join('')}</div>
+
+    <h2>Natural strengths</h2>
+    <ul class="pf-list">${strengths.slice(0, 7).map(x => `<li data-i="✦">${x}</li>`).join('')}</ul>
+
+    <h2>Growth edges</h2>
+    <ul class="pf-list">${edges.slice(0, 6).map(x => `<li data-i="◇">${x}</li>`).join('')}</ul>
+
+    <h2>Soul path · Nodal axis</h2>
+    <p class="pf-text">☊ <b>North Node in ${SIGNS[nnS][0]}</b> (${NAK_INFO[chart.northNode.nak.n][0]}): grow toward being ${T(nnS)[0].slice(0, 3).join(', ')}.<br>
+    ☋ <b>South Node in ${SIGNS[snS][0]}</b> (${NAK_INFO[chart.southNode.nak.n][0]}): you have innate ${T(snS)[0][0]} and ${T(snS)[0][1]} gifts, but should guard against being ${T(snS)[1][0]}.</p>
+
+    ${cosmicOdometer(utcMs)}
+
+    <h2>Your keywords</h2>
+    <div class="cloud">${cloud}</div>
+    <p class="note">This profile is generated from traditional meanings of signs, nakshatras, padas, dignities and aspects, weighted by each planet's importance. It is a reflective guide, not a definitive reading.</p>`;
+  $('pfSub').textContent = `Born ${$('date').value} ${$('time').value} · ${placeLabel() || $('tz').value.replace(/_/g, ' ')}`;
+  $('profileBody').querySelectorAll('.big3 [data-key]').forEach(d => d.addEventListener('click', () => selectBody(d.dataset.key, true)));
+}
+const cap = w => w[0].toUpperCase() + w.slice(1);
+
+// ---- Simple (no-jargon) profile mode
+let profileMode = localStorage.getItem('pfMode') || 'simple';
+const SIMPLE_ELEMENT = {
+  fire:  ['Action', 'You run on energy and enthusiasm. You like to jump in, get excited and make things happen.'],
+  earth: ['Practical', 'You are down-to-earth and dependable. You like real results, steady progress and finishing what you start.'],
+  air:   ['Thinking', 'You live in ideas and conversation. You like to talk things through, learn and connect with people.'],
+  water: ['Feeling', 'You go by feelings and gut instinct. You sense what others feel and care deeply about the people close to you.'],
+};
+const SIMPLE_MOD = {
+  Cardinal: ['Starter', 'You are a <b>starter</b>: you like to take the first step, lead and get things moving.'],
+  Fixed:    ['Keeper', 'You are a <b>keeper</b>: once you commit, you stay loyal and see things through to the end.'],
+  Mutable:  ['Adapter', 'You are an <b>adapter</b>: you go with the flow, handle change well and juggle many things.'],
+};
+const SIMPLE_PUR = {
+  Dharma: ['Purpose', 'doing what is right and having a meaningful purpose'],
+  Artha:  ['Success', 'building success, skills, money and security'],
+  Kama:   ['Love & joy', 'love, relationships, fun and enjoying life'],
+  Moksha: ['Inner peace', 'peace of mind, freedom and growing as a person'],
+};
+const SIMPLE_LOW = {
+  fire: 'Getting motivated can take a push, so set small goals to build momentum.',
+  earth: 'Day-to-day practical stuff (money, routines) may need extra attention.',
+  air: 'Stepping back to see the bigger picture may not come naturally.',
+  water: 'You may keep feelings inside, so practise saying how you feel.',
+};
+function simpleProfile({ T, sunS, moonS, ascS, nnS, snS, elP, modP, purP, domEl, domMod, domPur, lowEl, cloud, utcMs, bar, b3 }) {
+  const sun = T(sunS)[0], moon = T(moonS)[0], asc = ascS != null ? T(ascS)[0] : null;
+  let sum = `You are <b>${sun[0]}</b> and <b>${sun[1]}</b> at heart. On the inside you are <b>${moon[moonS === sunS ? 2 : 0]}</b> and <b>${moon[moonS === sunS ? 3 : 2]}</b>`;
+  sum += asc ? `, and when people first meet you, you come across as <b>${asc[1]}</b> and <b>${asc[3]}</b>. ` : '. ';
+  sum += `${SIMPLE_ELEMENT[domEl][1]} What drives you most is <b>${SIMPLE_PUR[domPur][1]}</b>.`;
+  const shadows = [...new Set([...T(sunS)[1].slice(0, 2), T(moonS)[1][0]])];
+  const watch = [`You can sometimes be <b>${shadows.join('</b>, <b>')}</b>, especially when stressed or tired.`, ...lowEl.map(e => SIMPLE_LOW[e])];
+  return `
+    <h2>You in a nutshell</h2>
+    <div class="pf-summary">${sum}</div>
+
+    <h2>Your three sides</h2>
+    <div class="big3">
+      ${b3('Your personality', 'sun', sunS, sun[0])}
+      ${b3('Your feelings', 'moon', moonS, moon[0])}
+      ${asc ? b3('First impression', null, ascS, asc[1]) : '<div><div class="t">First impression</div><div class="s" style="color:var(--muted)">?</div><div class="k">add your birth city</div></div>'}
+    </div>
+
+    <h2>What drives you</h2>
+    <div class="bars">${PADA_INFO.map(p => bar(SIMPLE_PUR[p.name][0], purP[p.name], p.color, p.name === domPur)).join('')}</div>
+    <p class="pf-text">Most of all you want <b>${SIMPLE_PUR[domPur][1]}</b>.</p>
+
+    <h2>How you get things done</h2>
+    <div class="bars">${MODS.map(m => bar(SIMPLE_MOD[m][0], modP[m], MODALITY_TEXT[m][0], m === domMod)).join('')}</div>
+    <p class="pf-text">${SIMPLE_MOD[domMod][1]}</p>
+
+    <h2>Your energy</h2>
+    <div class="bars">${ELEMENTS_ORDER.map(e => bar(SIMPLE_ELEMENT[e][0], elP[e], ELEMENT_TEXT[e][1], e === domEl)).join('')}</div>
+    <p class="pf-text">${SIMPLE_ELEMENT[domEl][1]}</p>
+
+    <h2>Words that describe you</h2>
+    <div class="cloud">${cloud}</div>
+
+    <h2>Watch out for</h2>
+    <ul class="pf-list">${watch.map(x => `<li data-i="◇">${x}</li>`).join('')}</ul>
+
+    <h2>Your life lesson</h2>
+    <p class="pf-text">You grow most by becoming more <b>${T(nnS)[0].slice(0, 2).join('</b> and <b>')}</b>, and by leaning less on old habits of being ${T(snS)[1][0]}.</p>
+
+    ${cosmicOdometer(utcMs)}
+    <p class="note">For fun and self-reflection, based on where the planets were when you were born. Switch to <b>Detailed</b> for the full astrology behind it.</p>`;
+}
+// ---- "As of today": Vimshottari dasha (5 levels) from the natal Moon's nakshatra
+let profileTab = 'overall';
+const YEAR_MS = 365.25 * 86400000;
+const DASHA_LEVELS = [
+  { name: 'Mahadasha',       simple: 'Life chapter',  span: 'years' },
+  { name: 'Antardasha',      simple: 'Current phase', span: 'months' },
+  { name: 'Pratyantardasha', simple: 'This stretch',  span: 'weeks' },
+  { name: 'Sukshma dasha',   simple: 'These days',    span: 'days' },
+  { name: 'Prana dasha',     simple: 'Right now',     span: 'hours' },
+];
+// plain meaning, one-word mood, good for, go easy on
+const DASHA_THEME = {
+  Sun:     ['a time to step forward, be seen and take charge of your own life', 'confidence', 'leadership, career visibility, health routines, dealing with authority', 'ego clashes, pride, burning out'],
+  Moon:    ['a softer, emotional time focused on home, family, comfort and caring for others', 'feelings', 'home, family, nurturing, public connection, rest', 'mood swings, over-sensitivity, worrying'],
+  Mars:    ['an energetic, driven time for action, courage, competition and getting things done', 'drive', 'bold moves, sport and fitness, property, tackling problems head-on', 'anger, rushing, accidents, arguments'],
+  Mercury: ['a busy, curious time for learning, talking, writing, trading and new skills', 'ideas', 'study, communication, business, networking, short trips', 'overthinking, nervousness, scattered focus'],
+  Jupiter: ['a time of growth, wisdom, good advice and expanding horizons', 'growth', 'learning, teaching, travel, children, faith, finding good mentors', 'overdoing it, over-promising, complacency'],
+  Venus:   ['a pleasant time for love, beauty, comfort, creativity and enjoying life', 'pleasure', 'relationships, marriage, art, style, comforts, making peace', 'over-indulgence, laziness, overspending'],
+  Saturn:  ['a slow, serious time that rewards patience, hard work and responsibility', 'discipline', 'long-term work, structure, duty, building something lasting', 'delays, heaviness, isolation, impatience with slow results'],
+  Rahu:    ['an ambitious, restless time of big desires, unusual paths and sudden changes', 'ambition', 'bold ambitions, technology, foreign links, breaking out of the box', 'confusion, obsession, shortcuts, illusions'],
+  Ketu:    ['an inward, detached time for letting go, spirituality and looking within', 'letting go', 'meditation, research, healing, finishing old business', 'feeling lost, sudden endings, losing motivation'],
+};
+// natural (naisargika) friendships; Rahu behaves like Saturn, Ketu like Mars
+const FRIENDS = {
+  Sun: [['Moon', 'Mars', 'Jupiter'], ['Venus', 'Saturn']], Moon: [['Sun', 'Mercury'], []],
+  Mars: [['Sun', 'Moon', 'Jupiter'], ['Mercury']], Mercury: [['Sun', 'Venus'], ['Moon']],
+  Jupiter: [['Sun', 'Moon', 'Mars'], ['Mercury', 'Venus']], Venus: [['Mercury', 'Saturn'], ['Sun', 'Moon']],
+  Saturn: [['Mercury', 'Venus'], ['Sun', 'Moon', 'Mars']],
+};
+FRIENDS.Rahu = FRIENDS.Saturn; FRIENDS.Ketu = FRIENDS.Mars;
+const relation = (a, b) => a === b ? 'same' : FRIENDS[a][0].includes(b) ? 'friend' : FRIENDS[a][1].includes(b) ? 'enemy' : 'neutral';
+
+const subPeriods = (start, len, i) => {
+  const out = []; let t = start;
+  for (let k = 0; k < 9; k++) {
+    const idx = (i + k) % 9, d = len * VIM_YEARS[NAK_LORDS[idx]] / 120;
+    out.push({ lord: NAK_LORDS[idx], idx, start: t, end: t + d }); t += d;
+  }
+  return out;
+};
+function vimshottari(moonSlon, birthMs) {
+  const n = Math.floor(moonSlon / NAK_SPAN) % 27, frac = (moonSlon - n * NAK_SPAN) / NAK_SPAN, i = n % 9;
+  const mdStart = birthMs - frac * VIM_YEARS[NAK_LORDS[i]] * YEAR_MS;
+  const mds = subPeriods(mdStart, 120 * YEAR_MS, i);
+  const chain = [];
+  let list = mds;
+  const now = Date.now();
+  for (let lvl = 0; lvl < 5; lvl++) {
+    const cur = list.find(p => now >= p.start && now < p.end);
+    if (!cur) break;
+    chain.push({ ...cur, siblings: list });
+    list = subPeriods(cur.start, cur.end - cur.start, cur.idx);
+  }
+  return { mds, chain, balance: (1 - frac) * VIM_YEARS[NAK_LORDS[i]], startLord: NAK_LORDS[i] };
+}
+const fmtDate = (ms, withTime) => new Date(ms).toLocaleString(undefined, withTime
+  ? { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' } : { year: 'numeric', month: 'short', day: 'numeric' });
+function fmtLeft(ms) {
+  const d = ms / 86400000;
+  if (d >= 365.25) { const y = Math.floor(d / 365.25), m = Math.floor((d - y * 365.25) / 30.44); return `${y} yr${y > 1 ? 's' : ''}${m ? ` ${m} mo` : ''}`; }
+  if (d >= 61) return `${Math.floor(d / 30.44)} months`;
+  if (d >= 2) return `${Math.floor(d)} days`;
+  const h = ms / 3600000;
+  return h >= 1 ? `${Math.floor(h)} h ${Math.floor((h % 1) * 60)} m` : `${Math.max(1, Math.round(h * 60))} min`;
+}
+function lordNatal(lord) {
+  const { chart, ascZ } = lastChart, key = LORD_KEY[lord], c = chart[key];
+  const sign = fmtDeg(c.zlon).sign, ascS = ascZ != null ? fmtDeg(ascZ).sign : null;
+  const rules = ascS == null ? [] : SIGN_LORDS.map((l, si) => l === lord ? ((si - ascS + 12) % 12) + 1 : 0).filter(Boolean);
+  return { key, sign, house: c.house, rules, nak: NAK_INFO[c.nak.n][0], dig: dignityOf(key, sign), retro: c.retro && !key.endsWith('Node') };
+}
+function dashaView() {
+  const { chart } = lastChart;
+  const v = vimshottari(chart.moon.slon, lastChart.utcMs), ch = v.chain;
+  if (!ch.length) return '<p class="pf-text">The Vimshottari cycle (120 years) has completed for this birth date.</p>';
+  const simple = profileMode === 'simple', now = Date.now();
+  const glyph = l => BODIES.find(b => b.key === LORD_KEY[l]);
+  const tag = l => { const b = glyph(l); return `<span data-key="${b.key}" class="dl" style="color:${hex(b.color)}">${b.glyph}${VS} ${l}</span>`; };
+  const [md, ad, pd, sd, prd] = ch;
+
+  const rows = ch.map((p, i) => {
+    const L = DASHA_LEVELS[i], b = glyph(p.lord), pctDone = (now - p.start) / (p.end - p.start) * 100, withTime = i >= 3;
+    return `<div class="ds-row">
+      <div class="ds-lvl">${simple ? L.simple : L.name}<small>${simple ? L.span : L.simple}</small></div>
+      <div class="ds-main"><div>${tag(p.lord)} <span class="ds-mood">${DASHA_THEME[p.lord][1]}</span></div>
+        <div class="ring"><i style="width:${pctDone.toFixed(1)}%;background:${hex(b.color)}"></i></div>
+        <small>${fmtDate(p.start, withTime)} → ${fmtDate(p.end, withTime)} · ${fmtLeft(p.end - now)} left</small></div></div>`;
+  }).join('');
+
+  const T = l => DASHA_THEME[l];
+  const rel = relation(md.lord, ad.lord);
+  const relText = { same: 'doubles down on the same energy', friend: 'work together smoothly, which makes this a supportive phase', neutral: 'are on neutral terms: results depend on your own effort', enemy: 'pull in different directions, which makes this phase mixed. Balance both sides' }[rel];
+
+  let html = `<h2>As of today · ${fmtDate(now, true)}</h2>`;
+  if (simple) {
+    html += `<div class="pf-summary">You are in your <b>${md.lord}</b> life chapter, ${T(md.lord)[0]}. It runs until <b>${fmtDate(md.end)}</b>.
+      ${md.lord === ad.lord ? `You are also in its own <b>${ad.lord}</b> phase, so this energy is at full strength until ${fmtDate(ad.end)}.` : `Inside that, the current <b>${ad.lord}</b> phase (until ${fmtDate(ad.end)}) adds a mood of <b>${T(ad.lord)[1]}</b>: ${T(ad.lord)[0]}.`}</div>
+      <div class="ds">${rows}</div>
+      <h2>Good time for</h2>
+      <ul class="pf-list">${[...new Set([T(md.lord)[2], T(ad.lord)[2]])].map(x => `<li data-i="✦">${cap(x)}</li>`).join('')}</ul>
+      <h2>Go easy on</h2>
+      <ul class="pf-list">${[...new Set([T(md.lord)[3], T(ad.lord)[3]])].map(x => `<li data-i="◇">${cap(x)}</li>`).join('')}</ul>
+      <p class="pf-text">Shorter cycles: these few weeks lean toward <b>${T(pd.lord)[1]}</b>${sd ? `, these days toward <b>${T(sd.lord)[1]}</b>` : ''}${prd ? `, and this very hour toward <b>${T(prd.lord)[1]}</b>` : ''}.</p>`;
+  } else {
+    const natal = (p, i) => {
+      const n = lordNatal(p.lord);
+      const hs = n.house ? ` in house <b>${n.house}</b> (${HOUSE_INFO[n.house - 1][0]})` : '';
+      const rl = n.rules.length ? `, ruling house${n.rules.length > 1 ? 's' : ''} <b>${n.rules.join(' & ')}</b> (${n.rules.map(h => HOUSE_INFO[h - 1][0]).join('; ')})` : '';
+      return `<li data-i="${i + 1}"><b>${DASHA_LEVELS[i].name} · ${p.lord}</b>: natally in ${SIGNS[n.sign][0]}${hs}, ${n.nak} nakshatra${rl}${n.dig ? `; <i>${n.dig[0].toLowerCase()}</i>` : ''}${n.retro ? '; retrograde' : ''}. Brings ${T(p.lord)[0]}.</li>`;
+    };
+    html += `<div class="pf-summary">Running <b>${md.lord}</b> Mahadasha / <b>${ad.lord}</b> Antardasha / <b>${pd.lord}</b> Pratyantardasha${sd ? ` / ${sd.lord} Sukshma` : ''}${prd ? ` / ${prd.lord} Prana` : ''}.
+      ${md.lord === ad.lord ? `The Mahadasha lord is running its own sub-period, which ${relText}.` : `${md.lord} and ${ad.lord} ${relText}.`}</div>
+      <div class="ds">${rows}</div>
+      <h2>Dasha lords in your chart</h2>
+      <ul class="pf-list">${ch.slice(0, 3).map(natal).join('')}</ul>
+      ${lastChart.ascZ == null ? '<p class="note">Add your birth city to see which houses each dasha lord occupies and rules.</p>' : ''}
+      <h2>${md.lord} Mahadasha · antardashas</h2>
+      <table class="ds-tl">${ad.siblings.map(p => `<tr class="${p.start === ad.start ? 'on' : ''}${p.end < now ? ' past' : ''}"><td>${tag(p.lord)}</td><td>${fmtDate(p.start)}</td><td>${fmtDate(p.end)}</td></tr>`).join('')}</table>
+      <h2>Mahadasha timeline</h2>
+      <table class="ds-tl">${v.mds.map(p => `<tr class="${p.start === md.start ? 'on' : ''}${p.end < now ? ' past' : ''}"><td>${tag(p.lord)}</td><td>${fmtDate(p.start)}</td><td>${fmtDate(p.end)}</td><td>${VIM_YEARS[p.lord]} yrs</td></tr>`).join('')}</table>
+      <p class="note">Vimshottari dasha from the natal Moon in ${NAK_INFO[chart.moon.nak.n][0]} (${$('zodiac').selectedOptions[0].text.split(' (')[0]} ayanamsa). Balance at birth: ${v.startLord} ${v.balance.toFixed(2)} years. Years of 365.25 days. Sukshma and Prana periods are very sensitive to birth time, since 1 minute of birth time shifts them noticeably.</p>`;
+  }
+  return html;
+}
+// ---- Share: draw a simple profile card (1080×1350, Instagram portrait) and hand it to the OS share sheet
+function shareData() {
+  const { chart, ascZ, utcMs } = lastChart;
+  const sgn = key => fmtDeg(chart[key].zlon).sign;
+  const sunS = sgn('sun'), moonS = sgn('moon'), ascS = ascZ != null ? fmtDeg(ascZ).sign : null;
+  const T = i => SIGN_TRAITS[i];
+  const el = { fire: 0, earth: 0, air: 0, water: 0 }, mod = { Cardinal: 0, Fixed: 0, Mutable: 0 }, pur = { Dharma: 0, Artha: 0, Kama: 0, Moksha: 0 };
+  for (const [k, w] of Object.entries(WEIGHT)) {
+    const si = sgn(k);
+    el[SIGNS[si][2]] += w; mod[SIGN_INFO[si].mod] += w; pur[PADA_INFO[chart[k].nak.pada - 1].name] += w;
+  }
+  if (ascS != null) { el[SIGNS[ascS][2]] += 3; mod[SIGN_INFO[ascS].mod] += 3; }
+  const topOf = o => Object.entries(o).sort((a, b) => b[1] - a[1])[0][0];
+  const words = new Map(), add = (w, n) => words.set(w, (words.get(w) || 0) + n);
+  T(sunS)[0].forEach(w => add(w, 2)); T(moonS)[0].slice(0, 3).forEach(w => add(w, 1.5));
+  if (ascS != null) T(ascS)[0].slice(0, 3).forEach(w => add(w, 1.5));
+  const v = vimshottari(chart.moon.slon, utcMs);
+  return { sunS, moonS, ascS, T, domEl: topOf(el), domMod: topOf(mod), domPur: topOf(pur),
+    words: [...words.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(e => e[0]), md: v.chain[0], ad: v.chain[1],
+    days: Math.floor((Date.now() - utcMs) / 86400000), laps: Math.floor((Date.now() - utcMs) / (365.256363 * 86400000)) };
+}
+function makeShareCard() {
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'), d = shareData();
+  const FONT = '"Inter", system-ui, -apple-system, "Segoe UI", sans-serif';
+  const font = (w, px) => (g.font = `${w} ${px}px ${FONT}`);
+  const css = n => '#' + n.toString(16).padStart(6, '0');
+  const rr = (x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+  // background + stars
+  const bg = g.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#1a1236'); bg.addColorStop(0.5, '#0b0d1f'); bg.addColorStop(1, '#071426');
+  g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 260; i++) {
+    g.fillStyle = `rgba(255,255,255,${(Math.random() * 0.6 + 0.15).toFixed(2)})`;
+    g.beginPath(); g.arc(Math.random() * W, Math.random() * H, Math.random() * 1.6 + 0.3, 0, 7); g.fill();
+  }
+  // sky snapshot from the live 3D view (centre crop), faded into the card
+  composer.render();
+  const src = renderer.domElement, sh = src.height * 0.4, sw = Math.min(src.width, sh * (W / 470));
+  const skyY = 150, skyH = 470;
+  g.save(); rr(48, skyY, W - 96, skyH, 28); g.clip();
+  g.drawImage(src, (src.width - sw) / 2, (src.height - sh) / 2, sw, sh, 48, skyY, W - 96, skyH);
+  const fade = g.createLinearGradient(0, skyY + skyH * 0.55, 0, skyY + skyH);
+  fade.addColorStop(0, 'rgba(11,13,31,0)'); fade.addColorStop(1, 'rgba(11,13,31,0.95)');
+  g.fillStyle = fade; g.fillRect(48, skyY, W - 96, skyH);
+  g.restore();
+  g.strokeStyle = 'rgba(160,170,255,0.25)'; g.lineWidth = 2; rr(48, skyY, W - 96, skyH, 28); g.stroke();
+  // header
+  g.textAlign = 'center'; g.fillStyle = '#f5c66b'; font(700, 30);
+  g.fillText('✦  MY COSMIC PROFILE  ✦', W / 2, 74);
+  if (placeLabel()) { g.fillStyle = '#b9bde0'; font(500, 26); g.fillText(placeLabel(), W / 2, 118); }
+  // nutshell line over the faded bottom of the sky
+  const sun = d.T(d.sunS)[0], moon = d.T(d.moonS)[0];
+  g.fillStyle = '#fff'; font(700, 40);
+  g.fillText(`${cap(sun[0])} & ${sun[1]} at heart`, W / 2, skyY + skyH - 70);
+  g.fillStyle = '#d6d9f2'; font(500, 30);
+  g.fillText(`${cap(moon[d.moonS === d.sunS ? 2 : 0])} & ${moon[d.moonS === d.sunS ? 3 : 2]} inside`, W / 2, skyY + skyH - 26);
+  // three sides
+  const cards = [['MY PERSONALITY', d.sunS, sun[0]], ['MY FEELINGS', d.moonS, moon[0]], ['FIRST IMPRESSION', d.ascS, d.ascS != null ? d.T(d.ascS)[0][1] : 'add birth city']];
+  const cw = (W - 96 - 2 * 24) / 3, cy = 660, ch = 230;
+  cards.forEach(([t, si, word], i) => {
+    const x = 48 + i * (cw + 24);
+    g.fillStyle = 'rgba(255,255,255,0.06)'; rr(x, cy, cw, ch, 22); g.fill();
+    g.strokeStyle = 'rgba(160,170,255,0.22)'; g.lineWidth = 2; g.stroke();
+    g.fillStyle = '#9aa0c8'; font(600, 20); g.fillText(t, x + cw / 2, cy + 42);
+    g.fillStyle = si != null ? css(ELEMENT_COLOR[SIGNS[si][2]]) : '#9aa0c8'; font(400, 72);
+    g.fillText(si != null ? SIGNS[si][1] + VS : '?', x + cw / 2, cy + 128);
+    g.fillStyle = '#fff'; font(700, 32); g.fillText(si != null ? SIGNS[si][0] : 'Rising', x + cw / 2, cy + 176);
+    g.fillStyle = '#f5c66b'; font(500, 24); g.fillText(word, x + cw / 2, cy + 210);
+  });
+  // keyword chips (centred rows)
+  font(600, 26);
+  const chips = d.words.map(w => ({ w, width: g.measureText(w).width + 44 }));
+  let rows = [[]], rowW = [0];
+  for (const ch2 of chips) {
+    if (rowW.at(-1) + ch2.width > W - 120) { rows.push([]); rowW.push(0); }
+    rows.at(-1).push(ch2); rowW[rowW.length - 1] += ch2.width + 14;
+  }
+  let y = 930;
+  rows.forEach((r, ri) => {
+    let x = (W - (rowW[ri] - 14)) / 2;
+    for (const ch2 of r) {
+      g.fillStyle = 'rgba(245,198,107,0.14)'; rr(x, y, ch2.width, 52, 26); g.fill();
+      g.strokeStyle = 'rgba(245,198,107,0.5)'; g.lineWidth = 2; g.stroke();
+      g.fillStyle = '#f5c66b'; g.textAlign = 'center'; g.fillText(ch2.w, x + ch2.width / 2, y + 35);
+      x += ch2.width + 14;
+    }
+    y += 64;
+  });
+  // three stats
+  const stats = [['DRIVEN BY', SIMPLE_PUR[d.domPur][0]], ['MY STYLE', SIMPLE_MOD[d.domMod][0]], ['MY ENERGY', SIMPLE_ELEMENT[d.domEl][0]]];
+  const sy = Math.max(y + 18, 1080);
+  stats.forEach(([t, val], i) => {
+    const x = 48 + i * (cw + 24) + cw / 2;
+    g.fillStyle = '#9aa0c8'; font(600, 20); g.fillText(t, x, sy);
+    g.fillStyle = '#fff'; font(700, 34); g.fillText(val, x, sy + 44);
+  });
+  // life chapter + fun fact
+  g.strokeStyle = 'rgba(160,170,255,0.18)'; g.lineWidth = 2; g.beginPath(); g.moveTo(120, sy + 82); g.lineTo(W - 120, sy + 82); g.stroke();
+  if (d.md) {
+    g.fillStyle = '#d6d9f2'; font(500, 27);
+    g.fillText(`Life chapter: ${d.md.lord} (${DASHA_THEME[d.md.lord][1]}) until ${new Date(d.md.end).getFullYear()}${d.ad ? ` · phase: ${d.ad.lord}` : ''}`, W / 2, sy + 130);
+  }
+  g.fillStyle = '#9aa0c8'; font(500, 25);
+  g.fillText(`${d.days.toLocaleString()} days on Earth · ${d.laps} laps around the Sun`, W / 2, sy + 172);
+  g.fillStyle = 'rgba(245,198,107,0.8)'; font(600, 22);
+  g.fillText(`✦ Celestial Birth Chart${/^https?:/.test(location.protocol) ? ' · ' + location.host : ''}`, W / 2, H - 34);
+  return new Promise(res => c.toBlob(res, 'image/png'));
+}
+async function shareProfile() {
+  if (!lastChart) return;
+  const btn = $('pfShare'); btn.classList.add('busy');
+  try {
+    const blob = await makeShareCard();
+    const file = new File([blob], 'my-cosmic-profile.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: 'My Cosmic Profile', text: '✦ My cosmic profile' }); return; }
+      catch (e) { if (e.name === 'AbortError') return; }
+    }
+    const url = URL.createObjectURL(blob);
+    $('shareImg').src = url; $('shareDl').href = url;
+    $('shareCopy').textContent = 'Copy image';
+    $('shareCopy').onclick = async () => {
+      try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); $('shareCopy').textContent = 'Copied ✓'; }
+      catch { $('shareCopy').textContent = 'Copy not supported'; }
+    };
+    $('shareModal').hidden = false;
+  } finally { btn.classList.remove('busy'); }
+}
+function setProfileTab(t) {
+  profileTab = t;
+  document.querySelectorAll('.pf-tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  $('profileBody').scrollTop = 0;
+  renderProfile();
+}
+function setProfileMode(m) {
+  profileMode = m; localStorage.setItem('pfMode', m);
+  document.querySelectorAll('.pf-mode button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  renderProfile();
+}
+
+// ---- Fun: how many times each body has gone round its orbit since the moment of birth
+// period = sidereal orbital period in days (Sun = its apparent yearly lap through the zodiac, i.e. Earth's orbit;
+// Moon = around Earth; Rahu·Ketu = one full backwards lap of the zodiac)
+const ODOMETER = [
+  { name: 'Sun',         glyph: '☉', color: 0xffd36b, period: 365.256363, label: 'laps through all 12 signs (Earth’s orbits)' },
+  { name: 'Moon',        glyph: '☽', color: 0xdfe6f5, period: 27.321661,  label: 'orbits of Earth' },
+  { name: 'Mercury',     glyph: '☿', color: 0xb9b2a8, period: 87.969 },
+  { name: 'Venus',       glyph: '♀', color: 0xf3d9a4, period: 224.701 },
+  { name: 'Mars',        glyph: '♂', color: 0xe0623f, period: 686.98 },
+  { name: 'Jupiter',     glyph: '♃', color: 0xd9b48a, period: 4332.59 },
+  { name: 'Saturn',      glyph: '♄', color: 0xe8d39a, period: 10759.22 },
+  { name: 'Uranus',      glyph: '♅', color: 0x9fe3ea, period: 30688.5 },
+  { name: 'Neptune',     glyph: '♆', color: 0x5b7cff, period: 60182 },
+  { name: 'Pluto',       glyph: '♇', color: 0xc7a08a, period: 90560 },
+  { name: 'Rahu · Ketu', glyph: '☊', color: 0xc58cff, period: 6798.38,    label: 'backwards laps of the zodiac' },
+];
+function cosmicOdometer(birthMs) {
+  const days = (Date.now() - birthMs) / 86400000;
+  if (!(days > 0)) return '';
+  const fmtN = n => n >= 100 ? Math.floor(n).toLocaleString() : n >= 10 ? n.toFixed(1) : n.toFixed(2);
+  const rows = ODOMETER.map(o => {
+    const orbits = days / o.period, done = Math.floor(orbits), frac = orbits - done;
+    const nextIn = (1 - frac) * o.period;
+    const next = nextIn < 60 ? `${Math.ceil(nextIn)} days` : nextIn < 730 ? `${(nextIn / 30.44).toFixed(0)} months` : `${(nextIn / 365.25).toFixed(1)} yrs`;
+    const status = done ? `${done.toLocaleString()} complete · next in ${next}` : `${(frac * 100).toFixed(0)}% of its first lap · completes in ${next}`;
+    return `<tr>
+      <td class="g" style="color:${hex(o.color)}">${o.glyph}${VS}</td>
+      <td>${o.name} <small>${o.label || 'orbits of the Sun'}</small><small class="st">${status}</small></td>
+      <td class="num">${fmtN(orbits)}<div class="ring"><i style="width:${(frac * 100).toFixed(1)}%;background:${hex(o.color)}"></i></div></td></tr>`;
+  }).join('');
+  const yrs = days / 365.25;
+  const precessMin = yrs * 50.29 / 60;                   // arcminutes the zodiac has slid against the equinox
+  const precessPct = yrs / 25772 * 100;                  // one full precession cycle ≈ 25,772 years
+  const galaxyPct = yrs / 230e6 * 100;                   // Sun's orbit round the Milky Way ≈ 230 million years
+  const earthKm = yrs * 940e6;
+  const big = n => n >= 1e9 ? (n / 1e9).toFixed(2) + ' billion' : (n / 1e6).toFixed(0) + ' million';
+  return `
+    <h2>Since you were born · cosmic odometer</h2>
+    <p class="pf-text">You have been alive for <b>${Math.floor(days).toLocaleString()}</b> days. Here's how many times each one has gone round its orbit since then:</p>
+    <table class="odo"><colgroup><col style="width:22px"><col><col style="width:78px"></colgroup><tr><th></th><th></th><th>Orbits</th></tr>${rows}</table>
+    <ul class="pf-list">
+      <li data-i="✦">The Sun has passed through each of the 12 constellations, Aries to Pisces, <b>${Math.floor(days / 365.256363)}</b> times, one full lap of the zodiac every year.</li>
+      <li data-i="✦">The constellations themselves are slowly turning too: precession has slid the zodiac <b>${precessMin.toFixed(1)}′</b>, which is <b>${precessPct.toFixed(3)}%</b> of its 25,772-year cycle. That's why the ayanamsa keeps growing.</li>
+      <li data-i="✦">Riding on Earth, you've travelled <b>${big(earthKm)} km</b> around the Sun, and the Sun has carried you <b>${galaxyPct.toPrecision(2)}%</b> of one orbit round the Milky Way.</li>
+    </ul>`;
+}
+
+const ordinal = n => n + (['th', 'st', 'nd', 'rd'][(n % 100 - 20) % 10] || ['th', 'st', 'nd', 'rd'][n % 100] || 'th');
+
+const ASPECTS = [
+  { name: 'Conjunction', glyph: '☌', angle: 0, orb: 8, color: 0xf5c66b },
+  { name: 'Sextile',     glyph: '⚹', angle: 60, orb: 5, color: 0x6fe0a8 },
+  { name: 'Square',      glyph: '□', angle: 90, orb: 7, color: 0xff6b6b },
+  { name: 'Trine',       glyph: '△', angle: 120, orb: 7, color: 0x5fb3ff },
+  { name: 'Opposition',  glyph: '☍', angle: 180, orb: 8, color: 0xff9f43 },
+];
+
+/* ============================================================
+   SCENE
+   ============================================================ */
+const container = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+const mqMobile = matchMedia('(max-width: 760px)');
+const isMobile = () => mqMobile.matches;
+renderer.setPixelRatio(Math.min(devicePixelRatio, isMobile() ? 1.5 : 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+container.appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer({ element: document.getElementById('labels') });
+labelRenderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x05060d, 0.004);
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 2000);
+const HOME_CAM = new THREE.Vector3(7, 27, 37);
+camera.position.set(0, 70, 150); // fly-in start
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.7, 0.5, 0.42);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.minDistance = 6;
+controls.maxDistance = 120;
+controls.autoRotateSpeed = 0.4;
+
+scene.add(new THREE.AmbientLight(0x8890c0, 0.55));
+const sunLight = new THREE.PointLight(0xfff0d0, 2.2, 0, 0);
+scene.add(sunLight);
+
+// ecliptic (lon, lat, r) -> scene. Ecliptic plane = XZ, north = +Y, lon increases counter-clockwise from above.
+function eclToVec(lon, lat, r) {
+  return new THREE.Vector3(r * cosD(lat) * cosD(lon), r * sinD(lat), -r * cosD(lat) * sinD(lon));
+}
+
+function makeLabel(text, cls = '', color) {
+  const div = document.createElement('div');
+  div.className = 'label ' + cls;
+  div.innerHTML = text;
+  if (color !== undefined) div.style.color = '#' + color.toString(16).padStart(6, '0');
+  return new CSS2DObject(div);
+}
+
+function glowTexture(inner = 'rgba(255,240,200,1)', outer = 'rgba(255,180,80,0)') {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grad.addColorStop(0, inner); grad.addColorStop(0.25, inner.replace(/[\d.]+\)$/, '0.6)'));
+  grad.addColorStop(1, outer);
+  g.fillStyle = grad; g.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(c);
+}
+
+// --- Background starfield
+{
+  const N = 6000, pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const u = Math.random() * 2 - 1, t = Math.random() * Math.PI * 2, r = 400 + Math.random() * 400;
+    const s = Math.sqrt(1 - u * u);
+    pos.set([r * s * Math.cos(t), r * u, r * s * Math.sin(t)], i * 3);
+    const tint = Math.random();
+    col.set(tint < 0.15 ? [1, 0.85, 0.7] : tint < 0.3 ? [0.75, 0.85, 1] : [1, 1, 1], i * 3);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({ size: 1.4, vertexColors: true, fog: false,
+    transparent: true, opacity: 0.85, sizeAttenuation: true })));
+}
+
+// --- Earth at the center (geocentric chart)
+const earth = new THREE.Mesh(new THREE.SphereGeometry(1.1, 48, 48),
+  new THREE.MeshStandardMaterial({ color: 0x2a6fdb, emissive: 0x0a2050, roughness: 0.7 }));
+scene.add(earth);
+earth.userData.key = 'earth';
+{
+  const atmo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture('rgba(120,180,255,0.9)', 'rgba(60,120,255,0)'),
+    blending: THREE.AdditiveBlending, depthWrite: false }));
+  atmo.scale.setScalar(3.4); earth.add(atmo);
+  const l = makeLabel('⊕ You', 'angle'); l.position.set(0, -1.5, 0); earth.add(l);
+}
+
+// --- Zodiac ring (signs placed on the dynamic group so sidereal shifts can rotate it)
+const zodiacGroup = new THREE.Group();
+scene.add(zodiacGroup);
+const signLabels = [];
+function buildZodiac() {
+  SIGNS.forEach(([name, glyph, el], i) => {
+    const color = ELEMENT_COLOR[el];
+    const geo = new THREE.RingGeometry(ZODIAC_IN, ZODIAC_OUT, 48, 1, i * 30 * D2R, 30 * D2R);
+    geo.rotateX(-Math.PI / 2);
+    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color, transparent: true,
+      opacity: i % 2 ? 0.10 : 0.16, side: THREE.DoubleSide, depthWrite: false }));
+    zodiacGroup.add(mesh);
+    const lbl = makeLabel(glyph + VS, 'sign', color);
+    lbl.position.copy(eclToVec(i * 30 + 15, 0, (ZODIAC_IN + ZODIAC_OUT) / 2));
+    lbl.element.title = name;
+    zodiacGroup.add(lbl);
+    signLabels.push(lbl);
+  });
+  // borders + degree ticks
+  const pts = [];
+  for (let d = 0; d < 360; d += 5) {
+    const major = d % 30 === 0, mid = d % 10 === 0;
+    const r0 = major ? ZODIAC_IN - 0.4 : ZODIAC_IN, r1 = major ? ZODIAC_OUT + 0.4 : ZODIAC_IN + (mid ? 0.6 : 0.3);
+    pts.push(eclToVec(d, 0, r0), eclToVec(d, 0, r1));
+  }
+  zodiacGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),
+    new THREE.LineBasicMaterial({ color: 0x9aa0c8, transparent: true, opacity: 0.45 })));
+  for (const r of [ZODIAC_IN, ZODIAC_OUT]) {
+    const circ = [];
+    for (let d = 0; d <= 360; d += 2) circ.push(eclToVec(d, 0, r));
+    zodiacGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(circ),
+      new THREE.LineBasicMaterial({ color: 0xb8bde8, transparent: true, opacity: 0.5 })));
+  }
+}
+buildZodiac();
+
+// faint orbit guides
+for (const b of BODIES) {
+  if (b.node || b.key === 'moon') continue;
+  const c = [];
+  for (let d = 0; d <= 360; d += 3) c.push(eclToVec(d, 0, b.r));
+  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(c),
+    new THREE.LineBasicMaterial({ color: 0x4a5080, transparent: true, opacity: 0.25 })));
+}
+
+// --- Planet meshes
+const bodyObjs = {};
+for (const b of BODIES) {
+  const group = new THREE.Group();
+  let mesh;
+  if (b.node) {
+    mesh = new THREE.Mesh(new THREE.OctahedronGeometry(b.size),
+      new THREE.MeshStandardMaterial({ color: b.color, emissive: b.color, emissiveIntensity: 0.6 }));
+  } else if (b.key === 'sun') {
+    mesh = new THREE.Mesh(new THREE.SphereGeometry(b.size, 48, 48), new THREE.MeshBasicMaterial({ color: new THREE.Color(b.color).multiplyScalar(0.55) }));
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }));
+    glow.scale.setScalar(2.6); mesh.add(glow);
+  } else {
+    mesh = new THREE.Mesh(new THREE.SphereGeometry(b.size, 32, 32),
+      new THREE.MeshStandardMaterial({ color: b.color, roughness: 0.8, emissive: b.color, emissiveIntensity: 0.15 }));
+  }
+  if (b.ring) {
+    const rg = new THREE.RingGeometry(b.size * 1.35, b.size * 2.1, 64);
+    const ring = new THREE.Mesh(rg, new THREE.MeshBasicMaterial({ color: 0xd8c38f, side: THREE.DoubleSide, transparent: true, opacity: 0.6 }));
+    ring.rotation.x = -Math.PI / 2 + 0.45; mesh.add(ring);
+  }
+  group.add(mesh);
+  const label = makeLabel('', b.node ? 'node' : '');
+  label.position.set(0, b.size + 0.2, 0);
+  group.add(label);
+  // projection ray from body out to zodiac ring
+  const rayGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+  const ray = new THREE.Line(rayGeo, new THREE.LineDashedMaterial({ color: b.color, dashSize: 0.3, gapSize: 0.25, transparent: true, opacity: 0.55 }));
+  scene.add(ray);
+  // marker on the zodiac ring
+  const tick = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 12), new THREE.MeshBasicMaterial({ color: new THREE.Color(b.color).multiplyScalar(0.5) }));
+  scene.add(tick);
+  scene.add(group);
+  const hit = new THREE.Mesh(new THREE.SphereGeometry(Math.max(b.size * 1.8, 0.7), 12, 12), new THREE.MeshBasicMaterial({ visible: false }));
+  hit.userData.key = b.key; group.add(hit);
+  bodyObjs[b.key] = { def: b, group, mesh, label, ray, tick, hit, cur: null, target: null };
+}
+
+// --- Zodiac constellations (stick figures from real star positions, RA hours / Dec degrees J2000)
+const CONSTELLATIONS = [
+  ['Aries', { a: [2.12, 23.46], b: [1.91, 20.81], g: [1.89, 19.29], c: [2.83, 27.26] }, [['c', 'a', 'b', 'g']]],
+  ['Taurus', { ald: [4.60, 16.51], eln: [5.44, 28.61], z: [5.63, 21.14], g: [4.33, 15.63], d: [4.38, 17.54], e: [4.48, 19.18], l: [4.01, 12.49], ple: [3.79, 24.11] },
+    [['z', 'ald', 'g', 'l'], ['g', 'd', 'e', 'eln'], ['l', 'ple']]],
+  ['Gemini', { cas: [7.58, 31.89], pol: [7.76, 28.03], alh: [6.63, 16.40], eps: [6.73, 25.13], mu: [6.38, 22.51], eta: [6.25, 22.51], del: [7.34, 21.98], xi: [6.75, 12.90], kap: [7.74, 24.40] },
+    [['cas', 'pol'], ['cas', 'eps', 'mu', 'eta'], ['pol', 'kap', 'del', 'alh'], ['del', 'xi']]],
+  ['Cancer', { a: [8.97, 11.86], d: [8.74, 18.15], g: [8.72, 21.47], b: [8.28, 9.19], i: [8.78, 28.76] }, [['i', 'g', 'd', 'a'], ['d', 'b']]],
+  ['Leo', { reg: [10.14, 11.97], eta: [10.12, 16.76], alg: [10.33, 19.84], z: [10.28, 23.42], mu: [9.88, 26.01], eps: [9.76, 23.77], zos: [11.24, 20.52], th: [11.24, 15.43], den: [11.82, 14.57] },
+    [['reg', 'eta', 'alg', 'z', 'mu', 'eps'], ['alg', 'zos', 'den', 'th', 'reg'], ['zos', 'th']]],
+  ['Virgo', { spi: [13.42, -11.16], por: [12.69, -1.45], vin: [13.04, 10.96], d: [12.93, 3.40], b: [11.84, 1.76], eta: [12.33, -0.67], z: [13.58, -0.60], i: [14.27, -6.00], mu: [14.72, -5.66] },
+    [['b', 'eta', 'por', 'd', 'vin'], ['por', 'spi'], ['d', 'z', 'i', 'mu'], ['z', 'spi']]],
+  ['Libra', { a: [14.85, -16.04], b: [15.28, -9.38], s: [15.07, -25.28], g: [15.59, -14.79], u: [15.62, -28.14] }, [['s', 'a', 'b', 'g', 'u'], ['a', 'g']]],
+  ['Scorpius', { ant: [16.49, -26.43], d: [16.01, -22.62], b: [16.09, -19.81], pi: [15.98, -26.11], sig: [16.35, -25.59], tau: [16.60, -28.22], eps: [16.84, -34.29], mu: [16.86, -38.05], z: [16.91, -42.36], eta: [17.20, -43.24], th: [17.62, -43.00], i: [17.79, -40.13], k: [17.71, -39.03], l: [17.56, -37.10] },
+    [['b', 'd', 'pi'], ['d', 'sig', 'ant', 'tau', 'eps', 'mu', 'z', 'eta', 'th', 'i', 'k', 'l']]],
+  ['Sagittarius', { ka: [18.40, -34.38], km: [18.35, -29.83], kb: [18.47, -25.42], g: [18.10, -30.42], nun: [18.92, -26.30], asc: [19.04, -29.88], phi: [18.76, -26.99], tau: [19.12, -27.67], eta: [18.29, -36.76] },
+    [['g', 'km', 'kb', 'phi', 'nun', 'tau', 'asc', 'phi'], ['asc', 'ka', 'g'], ['km', 'ka', 'eta'], ['km', 'phi']]],
+  ['Capricornus', { a: [20.30, -12.54], b: [20.35, -14.78], psi: [20.77, -25.27], om: [20.86, -26.92], z: [21.44, -22.41], d: [21.78, -16.13], g: [21.67, -16.66], i: [21.37, -16.83], th: [21.10, -17.23] },
+    [['a', 'b', 'psi', 'om', 'z', 'd', 'g', 'i', 'th', 'b']]],
+  ['Aquarius', { e: [20.79, -9.50], b: [21.53, -5.57], a: [22.10, -0.32], g: [22.36, -1.39], z: [22.48, -0.02], eta: [22.59, -0.12], pi: [22.42, 1.38], l: [22.88, -7.58], phi: [23.24, -6.05], d: [22.91, -15.82] },
+    [['e', 'b', 'a', 'g', 'z', 'eta'], ['z', 'pi'], ['g', 'l', 'd'], ['l', 'phi']]],
+  ['Pisces', { g: [23.29, 3.28], k: [23.45, 1.26], l: [23.70, 1.78], i: [23.67, 5.63], th: [23.47, 6.38], om: [23.99, 6.86], d: [0.81, 7.59], e: [1.05, 7.89], z: [1.23, 7.58], mu: [1.50, 6.14], nu: [1.69, 5.49], xi: [1.89, 3.19],
+    a: [2.03, 2.76], o: [1.76, 9.16], eta: [1.52, 15.35], chi: [1.19, 21.03], phi: [1.23, 24.58], ups: [1.32, 27.26], tau: [1.20, 30.09] },
+    [['g', 'k', 'l', 'i', 'th', 'g'], ['i', 'om', 'd', 'e', 'z', 'mu', 'nu', 'xi', 'a', 'o', 'eta', 'chi', 'phi', 'ups', 'tau']]],
+];
+function equToEcl(raH, dec) {
+  const a = raH * 15, e = 23.4392911;
+  const lon = norm(Math.atan2(sinD(a) * cosD(e) + Math.tan(dec * D2R) * sinD(e), cosD(a)) * R2D);
+  const lat = Math.asin(sinD(dec) * cosD(e) - cosD(dec) * sinD(e) * sinD(a)) * R2D;
+  return [lon, lat];
+}
+const constGroup = new THREE.Group();   // built in J2000 frame; rotated for precession in calculate()
+scene.add(constGroup);
+{
+  const lineMat = new THREE.LineBasicMaterial({ color: 0x7fa6ff, transparent: true, opacity: 0.55 });
+  const dotTex = glowTexture('rgba(210,225,255,1)', 'rgba(120,150,255,0)');
+  for (const [name, stars, paths] of CONSTELLATIONS) {
+    const pos = {};
+    let cx = 0, cy = 0, cz = 0, n = 0;
+    for (const [k, [ra, dec]] of Object.entries(stars)) {
+      const [lon, lat] = equToEcl(ra, dec);
+      pos[k] = eclToVec(lon, lat, STAR_R);
+      const dot = new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTex, transparent: true, opacity: 0.9,
+        blending: THREE.AdditiveBlending, depthWrite: false }));
+      dot.material.opacity = 0.55;
+      dot.position.copy(pos[k]); dot.scale.setScalar(0.38); constGroup.add(dot);
+      cx += pos[k].x; cy += pos[k].y; cz += pos[k].z; n++;
+    }
+    for (const path of paths)
+      constGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(path.map(k => pos[k])), lineMat));
+    const center = new THREE.Vector3(cx / n, cy / n, cz / n).setLength(STAR_R);
+    const lbl = makeLabel(name, 'const');
+    lbl.position.copy(center).add(new THREE.Vector3(0, -1.6, 0));
+    constGroup.add(lbl);
+  }
+}
+
+// --- Nakshatra layer (27 lunar mansions × 4 padas), always sidereal
+const nakGroup = new THREE.Group();
+scene.add(nakGroup);
+{
+  for (let p = 0; p < 108; p++) {
+    const g = new THREE.RingGeometry(NAK_IN, NAK_MID, 6, 1, p * PADA_SPAN * D2R, PADA_SPAN * D2R);
+    g.rotateX(-Math.PI / 2);
+    nakGroup.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: PADA_INFO[p % 4].color, transparent: true,
+      opacity: 0.32, side: THREE.DoubleSide, depthWrite: false })));
+  }
+  NAK_INFO.forEach(([name, , , gana], n) => {
+    const col = GANA_COLOR[gana];
+    const g = new THREE.RingGeometry(NAK_MID, NAK_OUT, 16, 1, n * NAK_SPAN * D2R, NAK_SPAN * D2R);
+    g.rotateX(-Math.PI / 2);
+    nakGroup.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: col, transparent: true,
+      opacity: n % 2 ? 0.07 : 0.13, side: THREE.DoubleSide, depthWrite: false })));
+    const l = makeLabel(`${n + 1}·${name}`, 'nak', col);
+    l.position.copy(eclToVec((n + 0.5) * NAK_SPAN, 0, (NAK_MID + NAK_OUT) / 2));
+    l.element.title = `${name} · ${gana} gana · ruled by ${NAK_LORDS[n % 9]}`;
+    nakGroup.add(l);
+  });
+  const major = [], minor = [];
+  for (let p = 0; p < 108; p++) {
+    const d = p * PADA_SPAN;
+    if (p % 4 === 0) major.push(eclToVec(d, 0, NAK_IN), eclToVec(d, 0, NAK_OUT));
+    else minor.push(eclToVec(d, 0, NAK_IN), eclToVec(d, 0, NAK_MID));
+  }
+  nakGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(major),
+    new THREE.LineBasicMaterial({ color: 0xc9cdf0, transparent: true, opacity: 0.45 })));
+  nakGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(minor),
+    new THREE.LineBasicMaterial({ color: 0xc9cdf0, transparent: true, opacity: 0.2 })));
+  for (const r of [NAK_IN, NAK_OUT]) {
+    const c = [];
+    for (let d = 0; d <= 360; d += 2) c.push(eclToVec(d, 0, r));
+    nakGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(c),
+      new THREE.LineBasicMaterial({ color: 0xb8bde8, transparent: true, opacity: 0.35 })));
+  }
+}
+// each planet lights up the pada it occupies
+BODIES.forEach((b, i) => {
+  const arc = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({
+    color: new THREE.Color(b.color).multiplyScalar(0.6), transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false }));
+  arc.add(new THREE.LineLoop(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: b.color, transparent: true, opacity: 0.75 })));
+  arc.position.y = 0.01 * (i + 1);
+  nakGroup.add(arc);
+  bodyObjs[b.key].padaArc = arc;
+});
+
+// --- Nebula clouds (far background)
+{
+  const neb = (r, g, b) => glowTexture(`rgba(${r},${g},${b},0.9)`, `rgba(${r},${g},${b},0)`);
+  [[120, 60, 200, 30, 20, 0.16], [40, 110, 220, 160, -15, 0.13], [220, 80, 140, 250, 35, 0.12], [60, 180, 200, 320, -40, 0.1]]
+    .forEach(([r, g, b, lon, lat, op]) => {
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: neb(r, g, b), transparent: true, opacity: op,
+        blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
+      sp.position.copy(eclToVec(lon, lat, 380)); sp.scale.setScalar(420); scene.add(sp);
+    });
+}
+
+// --- Selection halo + tour beam
+const halo = new THREE.Mesh(new THREE.RingGeometry(1, 1.08, 64), new THREE.MeshBasicMaterial({ color: 0xffffff,
+  transparent: true, opacity: 0.9, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
+halo.visible = false; scene.add(halo);
+const beam = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
+  new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending }));
+beam.visible = false; scene.add(beam);
+
+// --- Lunar orbit (tilted 5.145° through the nodes) + nodal axis
+const lunarOrbit = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xc58cff, transparent: true, opacity: 0.55 }));
+scene.add(lunarOrbit);
+const nodalAxis = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineDashedMaterial({ color: 0xc58cff, dashSize: 0.4, gapSize: 0.3, transparent: true, opacity: 0.7 }));
+scene.add(nodalAxis);
+function updateLunarOrbit(nodeLon) {
+  const i = 5.145, r = bodyObjs.moon.def.r, pts = [];
+  for (let u = 0; u <= 360; u += 3) {
+    const X = cosD(nodeLon) * cosD(u) - sinD(nodeLon) * sinD(u) * cosD(i);
+    const Y = sinD(nodeLon) * cosD(u) + cosD(nodeLon) * sinD(u) * cosD(i);
+    const Z = sinD(u) * sinD(i);
+    pts.push(new THREE.Vector3(r * X, r * Z, -r * Y));
+  }
+  lunarOrbit.geometry.dispose();
+  lunarOrbit.geometry = new THREE.BufferGeometry().setFromPoints(pts);
+  nodalAxis.geometry.dispose();
+  nodalAxis.geometry = new THREE.BufferGeometry().setFromPoints([eclToVec(nodeLon, 0, ZODIAC_IN), eclToVec(nodeLon + 180, 0, ZODIAC_IN)]);
+  nodalAxis.computeLineDistances();
+}
+
+// --- Fixed stars
+const starGroup = new THREE.Group();
+scene.add(starGroup);
+const starTex = glowTexture('rgba(220,230,255,1)', 'rgba(150,170,255,0)');
+const starObjs = STARS.map(([name, lon, lat, mag]) => {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: starTex, blending: THREE.AdditiveBlending, depthWrite: false }));
+  s.scale.setScalar(Math.max(0.45, 1.5 - mag * 0.35)); s.material.opacity = 0.75;
+  const l = makeLabel('✦ ' + name, 'star'); l.position.set(0, 0.6, 0); s.add(l);
+  starGroup.add(s);
+  return { s, name, lon, lat, label: l };
+});
+
+// --- Angles (Ascendant / MC axes)
+const angleGroup = new THREE.Group();
+scene.add(angleGroup);
+
+// --- Aspect lines
+const aspectGroup = new THREE.Group();
+scene.add(aspectGroup);
+let aspectLines = [];
+
+/* ============================================================
+   UI + CHART LOGIC
+   ============================================================ */
+const $ = id => document.getElementById(id);
+
+function fmtDeg(lon) {
+  const s = Math.floor(lon / 30), d = lon - s * 30;
+  let deg = Math.floor(d), min = Math.round((d - deg) * 60);
+  if (min === 60) { min = 0; deg += 1; }
+  return { sign: s, text: `${deg}°${String(min).padStart(2, '0')}′`, short: `${deg}°` };
+}
+const signIdx = lon => Math.floor(norm(lon) / 30);
+
+const DEFAULT_DATE = '1999-04-15', DEFAULT_TIME = '11:11';
+const BROWSER_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+
+// offset (minutes) of an IANA zone at a given UTC instant — uses the browser's historical tz database (DST aware)
+function zoneOffsetMin(utcMs, zone) {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: zone, hourCycle: 'h23',
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    .formatToParts(new Date(utcMs)).map(p => [p.type, p.value]));
+  const asUtc = Date.UTC(+parts.year, parts.month - 1, +parts.day, +parts.hour, +parts.minute, +parts.second);
+  return Math.round((asUtc - utcMs) / 60000);
+}
+// local wall-clock time in a zone -> UTC ms
+function localToUtc(y, m, d, hh, mm, zone) {
+  const guess = Date.UTC(y, m - 1, d, hh, mm);
+  let utc = guess - zoneOffsetMin(guess, zone) * 60000;
+  utc = guess - zoneOffsetMin(utc, zone) * 60000;
+  return utc;
+}
+const fmtOffset = min => `UTC${min < 0 ? '−' : '+'}${String(Math.floor(Math.abs(min) / 60)).padStart(2, '0')}:${String(Math.abs(min) % 60).padStart(2, '0')}`;
+
+// extra search keywords for popular zones
+const TZ_ALIASES = {
+  'Asia/Kolkata': 'India IST Calcutta Hyderabad Mumbai Bombay Delhi Bangalore Bengaluru Chennai Madras Pune',
+  'America/New_York': 'EST EDT Eastern US', 'America/Chicago': 'CST CDT Central US Texas Dallas Houston',
+  'America/Denver': 'MST MDT Mountain US', 'America/Los_Angeles': 'PST PDT Pacific US California San Francisco Seattle',
+  'America/Phoenix': 'Arizona', 'Europe/London': 'GMT BST UK Britain England', 'Asia/Tokyo': 'JST Japan',
+  'Asia/Shanghai': 'China Beijing CST', 'Asia/Dubai': 'UAE Gulf GST', 'Asia/Singapore': 'SGT',
+  'Australia/Sydney': 'AEST AEDT Melbourne', 'Asia/Kathmandu': 'Nepal', 'Asia/Karachi': 'Pakistan PKT',
+  'Asia/Dhaka': 'Bangladesh', 'Asia/Colombo': 'Sri Lanka', 'Europe/Paris': 'CET France', 'Europe/Berlin': 'CET Germany',
+  'Asia/Calcutta': 'India IST Kolkata Hyderabad Mumbai Bombay Delhi Bangalore Bengaluru Chennai Madras Pune',
+  'Asia/Katmandu': 'Nepal Kathmandu', 'Europe/Kiev': 'Ukraine Kyiv', 'Asia/Saigon': 'Vietnam Ho Chi Minh', 'Asia/Rangoon': 'Myanmar Yangon',
+  'America/Toronto': 'Canada Eastern', 'America/Vancouver': 'Canada Pacific', 'Pacific/Auckland': 'NZ New Zealand',
+};
+let TZ_LIST = [];
+function populateTimezones() {
+  let zones = typeof Intl.supportedValuesOf === 'function' ? Intl.supportedValuesOf('timeZone') : [];
+  if (!zones.includes('UTC')) zones = ['UTC', ...zones];
+  if (!zones.includes(BROWSER_TZ)) zones = [BROWSER_TZ, ...zones];
+  const now = Date.now();
+  TZ_LIST = zones.map(tzItem);
+  setupTzCombo();
+  selectTz(BROWSER_TZ, false);
+}
+
+function tzItem(z) {
+  const off = fmtOffset(zoneOffsetMin(Date.now(), z));
+  const label = z.replace(/_/g, ' ');
+  return { z, label, off, hay: `${label} ${off} ${off.replace('−', '-')} ${TZ_ALIASES[z] || ''}`.toLowerCase() };
+}
+// zones newer than some browsers' tz database -> closest historically-equivalent zone
+const TZ_FALLBACK = { 'America/Coyhaique': 'America/Santiago' };
+function selectTz(z, recalc = true) {
+  let item = TZ_LIST.find(t => t.z === z);
+  if (!item) {
+    // modern names (e.g. Asia/Kolkata) may be missing from the browser's list, which uses legacy
+    // canonical names (Asia/Calcutta). They're still valid for Intl, so add them on demand.
+    try { new Intl.DateTimeFormat('en-US', { timeZone: z }); }
+    catch { if (TZ_FALLBACK[z]) return selectTz(TZ_FALLBACK[z], recalc); console.warn('Unknown timezone', z); return; }
+    item = tzItem(z); TZ_LIST.unshift(item);
+  }
+  $('tz').value = z;
+  $('tzSearch').value = item.label;
+  if (recalc) calculate();
+}
+
+/* ============================================================
+   BIRTH PLACE: country + city pickers (GeoNames data in cities.js)
+   ============================================================ */
+const fold = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const esc = t => t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let COUNTRIES = [], birthCountry = null, birthPlace = null;
+const cityCache = {};
+function citiesOf(cc) {
+  if (cityCache[cc]) return cityCache[cc];
+  const [cname, admins, enc] = GEO.c[cc];
+  return (cityCache[cc] = enc ? enc.split(';').map((r, rank) => {
+    const [name, lat, lon, tz, ai] = r.split('|');
+    const admin = admins[+ai] || '';
+    return { cc, name, admin, country: cname, lat: +lat, lon: +lon, tz: GEO.tz[+tz], rank, hay: fold(`${name} ${admin} ${cname}`) };
+  }) : []);
+}
+let ALL_CITIES = null;
+const allCities = () => ALL_CITIES || (ALL_CITIES = COUNTRIES.flatMap(c => citiesOf(c.id)));
+
+function loadGeo() {
+  return new Promise((res, rej) => {
+    if (window.GEO) return res();
+    const sc = document.createElement('script');
+    sc.src = 'cities.js'; sc.onload = res; sc.onerror = rej;
+    document.head.appendChild(sc);
+  });
+}
+
+// generic searchable combobox
+function makeCombo({ input, list, search, onPick, current, empty = 'No matches' }) {
+  let matches = [], active = 0;
+  const render = () => {
+    list.innerHTML = matches.length ? matches.map((m, i) =>
+      `<div class="combo-opt${i === active ? ' active' : ''}" data-i="${i}" role="option"><span>${esc(m.label)}</span><small>${esc(m.sub || '')}</small></div>`).join('')
+      : `<div class="combo-empty">${empty}</div>`;
+    list.querySelector('.active')?.scrollIntoView({ block: 'nearest' });
+  };
+  const filter = q => { matches = search(q); active = 0; render(); };
+  const choose = m => { list.classList.remove('open'); input.value = m.label; input.blur(); onPick(m); };
+  input.addEventListener('focus', () => { input.select(); filter(''); list.classList.add('open'); });
+  input.addEventListener('input', () => { filter(input.value); list.classList.add('open'); });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { active = Math.min(active + 1, matches.length - 1); render(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { active = Math.max(active - 1, 0); render(); e.preventDefault(); }
+    else if (e.key === 'Enter') { if (matches[active]) choose(matches[active]); e.preventDefault(); }
+    else if (e.key === 'Escape') input.blur();
+  });
+  list.addEventListener('mousedown', e => {
+    const o = e.target.closest('.combo-opt'); if (o) { e.preventDefault(); choose(matches[+o.dataset.i]); }
+  });
+  input.addEventListener('blur', () => setTimeout(() => { list.classList.remove('open'); input.value = current(); }, 120));
+}
+
+function searchList(items, q, limit = 120) {
+  const terms = fold(q).split(/\s+/).filter(Boolean);
+  if (!terms.length) return items.slice(0, limit);
+  const hits = [];
+  for (const it of items) {
+    if (terms.every(w => it.hay.includes(w))) hits.push(it);
+    if (hits.length > 4000) break;
+  }
+  const first = terms[0], starts = it => fold(it.name || it.label).startsWith(first);
+  hits.sort((a, b) => (starts(b) - starts(a)) || ((a.rank ?? 0) - (b.rank ?? 0)));
+  return hits.slice(0, limit);
+}
+
+function placeLabel() {
+  if (birthPlace) return `${birthPlace.name}, ${birthPlace.country}`;
+  if ($('lat').value && $('lon').value) return 'custom coordinates';
+  return '';
+}
+function showCoords(prefix) {
+  const lat = parseFloat($('lat').value), lon = parseFloat($('lon').value);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    $('coordsLine').textContent = 'Pick your birth city to set location & timezone automatically.'; return;
+  }
+  const ll = `${Math.abs(lat).toFixed(3)}°${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lon).toFixed(3)}°${lon >= 0 ? 'E' : 'W'}`;
+  $('coordsLine').innerHTML = `📍 ${prefix} · ${ll}`;
+}
+
+function pickCity(c, recalc = true) {
+  birthPlace = c;
+  if (!birthCountry || birthCountry.id !== c.cc) birthCountry = COUNTRIES.find(x => x.id === c.cc);
+  $('countrySearch').value = birthCountry ? birthCountry.label : '';
+  $('citySearch').value = c.name;
+  $('lat').value = c.lat; $('lon').value = c.lon;
+  selectTz(c.tz, false);
+  showCoords(`<b>${esc(c.name)}</b>${c.admin ? ', ' + esc(c.admin) : ''}, ${esc(c.country)} · ${c.tz.replace(/_/g, ' ')}`);
+  if (recalc) calculate();
+}
+
+async function initPlacePickers() {
+  try { await loadGeo(); } catch {
+    $('countrySearch').placeholder = $('citySearch').placeholder = 'Unavailable';
+    $('coordsLine').textContent = 'Could not load the city list. Enter coordinates manually below.';
+    $('manualBox').open = true;
+    return;
+  }
+  COUNTRIES = Object.entries(GEO.c).map(([id, [label]]) => ({ id, label, sub: id, hay: fold(`${label} ${id}`) }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+  for (const id of ['countrySearch', 'citySearch']) { $(id).disabled = false; }
+  $('countrySearch').placeholder = 'Search country…';
+  $('citySearch').placeholder = 'Search city…';
+
+  makeCombo({
+    input: $('countrySearch'), list: $('countryList'), empty: 'No matching country',
+    search: q => searchList(COUNTRIES, q, 300),
+    current: () => birthCountry ? birthCountry.label : '',
+    onPick: c => {
+      if (birthCountry?.id !== c.id) { birthPlace = null; $('citySearch').value = ''; }
+      birthCountry = c;
+      $('citySearch').placeholder = `Search cities in ${c.label}…`;
+      setTimeout(() => $('citySearch').focus(), 50);
+    },
+  });
+  makeCombo({
+    input: $('citySearch'), list: $('cityList'), empty: 'No matching city (try a nearby larger town)',
+    search: q => searchList(birthCountry ? citiesOf(birthCountry.id) : (q.trim() ? allCities() : []), q)
+      .map(c => ({ ...c, label: c.name, sub: birthCountry ? c.admin : `${c.admin ? c.admin + ', ' : ''}${c.country}` })),
+    current: () => birthPlace ? birthPlace.name : '',
+    onPick: c => pickCity(c),
+  });
+}
+
+// manual coordinates / device location override the city
+function customLocation(label) {
+  birthPlace = null; $('citySearch').value = '';
+  showCoords(label);
+}
+['lat', 'lon'].forEach(id => $(id).addEventListener('change', () => { customLocation('Custom coordinates'); calculate(); }));
+
+function setupTzCombo() {
+  const input = $('tzSearch'), list = $('tzList');
+  let matches = [], active = 0;
+  const render = () => {
+    if (!matches.length) { list.innerHTML = '<div class="combo-empty">No matching timezone</div>'; return; }
+    list.innerHTML = matches.slice(0, 200).map((t, i) =>
+      `<div class="combo-opt${i === active ? ' active' : ''}${t.z === $('tz').value ? ' sel' : ''}" data-z="${t.z}" role="option">
+        <span>${t.label}</span><small>${t.off}</small></div>`).join('');
+    list.querySelector('.active')?.scrollIntoView({ block: 'nearest' });
+  };
+  const filter = q => {
+    const terms = q.toLowerCase().replace(/_/g, ' ').split(/\s+/).filter(Boolean);
+    matches = terms.length ? TZ_LIST.filter(t => terms.every(w => t.hay.includes(w))) : TZ_LIST;
+    // rank: matches at the start of the city name first
+    if (terms.length) {
+      const city = t => t.label.split('/').pop().toLowerCase();
+      matches = [...matches].sort((a, b) => (city(b).startsWith(terms[0]) - city(a).startsWith(terms[0])));
+    }
+    active = 0; render();
+  };
+  const open = () => { list.classList.add('open'); };
+  const close = () => { list.classList.remove('open'); selectTz($('tz').value, false); };
+  const choose = z => { list.classList.remove('open'); selectTz(z); input.blur(); };
+
+  input.addEventListener('focus', () => { input.select(); filter(''); open();
+    const i = matches.findIndex(t => t.z === $('tz').value); if (i >= 0) { active = i; render(); } });
+  input.addEventListener('input', () => { filter(input.value); open(); });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { active = Math.min(active + 1, matches.length - 1); render(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { active = Math.max(active - 1, 0); render(); e.preventDefault(); }
+    else if (e.key === 'Enter') { if (matches[active]) choose(matches[active].z); e.preventDefault(); }
+    else if (e.key === 'Escape') { close(); input.blur(); }
+  });
+  list.addEventListener('mousedown', e => {
+    const opt = e.target.closest('.combo-opt'); if (opt) { e.preventDefault(); choose(opt.dataset.z); }
+  });
+  input.addEventListener('blur', () => setTimeout(close, 100));
+}
+
+function readUtc() {
+  const [y, m, d] = $('date').value.split('-').map(Number);
+  const [hh, mm] = ($('time').value || '12:00').split(':').map(Number);
+  const utcMs = localToUtc(y, m, d, hh, mm, $('tz').value);
+  $('tzInfo').textContent = `· ${fmtOffset(zoneOffsetMin(utcMs, $('tz').value))} at birth`;
+  return utcMs;
+}
+
+function setNow() {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: $('tz').value, hourCycle: 'h23',
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+    .formatToParts(new Date()).map(p => [p.type, p.value]));
+  $('date').value = `${parts.year}-${parts.month}-${parts.day}`;
+  $('time').value = `${parts.hour}:${parts.minute}`;
+}
+
+let lastChart = null;
+
+function calculate() {
+  if (!$('date').value) return;
+  const utcMs = readUtc();
+  const jd = utcMs / 86400000 + 2440587.5;
+
+  const kp = $('zodiac').value === 'kp';
+  const sidereal = true;                             // Vedic only: Lahiri or KP ayanamsa
+  const ayanL = kp ? kpAyanamsa(jd) : lahiri(jd);
+  const ayan = ayanL;
+  const now = computeAll(jd), before = computeAll(jd - 0.5), after = computeAll(jd + 0.5);
+
+  const lat = parseFloat($('lat').value), lon = parseFloat($('lon').value);
+  const hasLoc = Number.isFinite(lat) && Number.isFinite(lon);
+  const ang = hasLoc ? angles(jd, lat, lon) : null;
+
+  const T = (jd - 2451545.0) / 36525;
+  const chart = {};
+  for (const b of BODIES) {
+    const p = now[b.key];
+    let speed = after[b.key].lon - before[b.key].lon;
+    if (speed > 180) speed -= 360; if (speed < -180) speed += 360;
+    const slon = norm(p.lon - ayanL);
+    chart[b.key] = { lon: p.lon, lat: p.lat, zlon: norm(p.lon - ayan), slon, nak: nakOf(slon), retro: speed < 0 };
+  }
+
+  // ---- 3D: everything is drawn in tropical ecliptic space; the zodiac ring rotates by the ayanamsa
+  zodiacGroup.rotation.y = ayan * D2R;
+  nakGroup.rotation.y = ayanL * D2R;
+  constGroup.rotation.y = PRECESSION * T * D2R;
+  for (const b of BODIES) {
+    const gp = Math.floor(chart[b.key].slon / PADA_SPAN), arc = bodyObjs[b.key].padaArc;
+    arc.geometry.dispose();
+    arc.geometry = new THREE.RingGeometry(NAK_IN, NAK_OUT, 6, 1, gp * PADA_SPAN * D2R, PADA_SPAN * D2R).rotateX(-Math.PI / 2);
+    const a0 = gp * PADA_SPAN, a1 = a0 + PADA_SPAN, outline = arc.children[0];
+    outline.geometry.dispose();
+    outline.geometry = new THREE.BufferGeometry().setFromPoints([
+      eclToVec(a0, 0, NAK_IN), eclToVec(a0, 0, NAK_OUT), eclToVec((a0 + a1) / 2, 0, NAK_OUT), eclToVec(a1, 0, NAK_OUT),
+      eclToVec(a1, 0, NAK_IN), eclToVec((a0 + a1) / 2, 0, NAK_IN)]);
+  }
+  for (const b of BODIES) {
+    const o = bodyObjs[b.key];
+    o.target = { lon: chart[b.key].lon, lat: chart[b.key].lat };
+    if (!o.cur) o.cur = { ...o.target, lon: o.target.lon - 90 };
+    const f = fmtDeg(chart[b.key].zlon);
+    o.label.element.innerHTML = `${b.glyph}${VS} ${b.name} <b>${f.short}</b>${SIGNS[f.sign][1]}${VS}${chart[b.key].retro && !b.node ? ' <span style="color:#ff8a8a">℞</span>' : ''}`;
+  }
+  updateLunarOrbit(chart.northNode.lon);
+
+  starObjs.forEach(st => {
+    const L = norm(st.lon + PRECESSION * T);
+    st.s.position.copy(eclToVec(L, st.lat, STAR_R));
+    const f = fmtDeg(norm(L - ayan));
+    st.label.element.innerHTML = `✦ ${st.name} <span style="opacity:.6">${f.short}${SIGNS[f.sign][1]}${VS}</span>`;
+  });
+
+  // angles
+  angleGroup.clear();
+  if (ang) {
+    const mk = (lonA, name, color) => {
+      const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([eclToVec(lonA + 180, 0, NAK_OUT + 1.5), eclToVec(lonA, 0, NAK_OUT + 1.5)]),
+        new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.8 }));
+      angleGroup.add(line);
+      const f1 = fmtDeg(norm(lonA - ayan));
+      const l1 = makeLabel(`${name[0]} ${f1.short}${SIGNS[f1.sign][1]}${VS}`, 'angle');
+      l1.position.copy(eclToVec(lonA, 0, NAK_OUT + 2.4)); angleGroup.add(l1);
+      const f2 = fmtDeg(norm(lonA + 180 - ayan));
+      const l2 = makeLabel(`${name[1]} ${f2.short}${SIGNS[f2.sign][1]}${VS}`, 'angle');
+      l2.position.copy(eclToVec(lonA + 180, 0, NAK_OUT + 2.4)); angleGroup.add(l2);
+    };
+    mk(ang.asc, ['ASC', 'DSC'], 0xf5c66b);
+    mk(ang.mc, ['MC', 'IC'], 0x8fd3ff);
+  }
+
+  // ---- Aspects (among planets; nodes only by conjunction)
+  const keys = BODIES.filter(b => !b.node).map(b => b.key);
+  const found = [];
+  for (let i = 0; i < keys.length; i++) for (let j = i + 1; j < keys.length; j++) {
+    let diff = Math.abs(chart[keys[i]].lon - chart[keys[j]].lon); if (diff > 180) diff = 360 - diff;
+    for (const a of ASPECTS) {
+      const orb = Math.abs(diff - a.angle);
+      if (orb <= a.orb) { found.push({ a: keys[i], b: keys[j], asp: a, orb }); break; }
+    }
+  }
+  for (const k of keys) for (const n of ['northNode', 'southNode']) {
+    let diff = Math.abs(chart[k].lon - chart[n].lon); if (diff > 180) diff = 360 - diff;
+    if (diff <= 5) found.push({ a: k, b: n, asp: ASPECTS[0], orb: diff });
+  }
+  found.sort((p, q) => p.orb - q.orb);
+  aspectGroup.clear();
+  aspectLines = found.map(f => {
+    const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
+      new THREE.LineBasicMaterial({ color: f.asp.color, transparent: true, opacity: Math.max(0.25, 0.9 - f.orb * 0.08) }));
+    aspectGroup.add(line);
+    return { line, a: f.a, b: f.b };
+  });
+
+  // ---- Table
+  const byKey = Object.fromEntries(BODIES.map(b => [b.key, b]));
+  const rows = BODIES.map(b => {
+    const c = chart[b.key], f = fmtDeg(c.zlon);
+    const house = ang ? ((signIdx(c.zlon) - signIdx(norm(ang.asc - ayan)) + 12) % 12) + 1 : '';
+    const kl = kp && kpLords(c.slon);
+    const nk = `${shortNak(NAK_INFO[c.nak.n][0])} ${c.nak.pada}` + (kp ? `<br><span class="kp">${kpText(kl)}</span>` : '');
+    return `<tr data-key="${b.key}">
+      <td class="g" style="color:#${b.color.toString(16).padStart(6, '0')}">${b.glyph}${VS}</td>
+      <td>${b.name}</td>
+      <td class="deg"><span class="sign-g">${SIGNS[f.sign][1]}${VS}</span>${f.text} ${SIGNS[f.sign][0]}</td>
+      <td class="r">${c.retro && !b.node ? '℞' : ''}</td>
+      <td class="nk" title="Pada ${c.nak.pada} · ${PADA_INFO[c.nak.pada - 1].name}${kp ? ' · ' + kpTitle(kl) : ''}"><span style="color:${'#' + PADA_INFO[c.nak.pada - 1].color.toString(16)}">●</span> ${nk}</td>
+      <td class="h">${house ? 'H' + house : ''}</td></tr>`;
+  });
+  if (ang) {
+    for (const [name, L] of [['Ascendant', ang.asc], ['Midheaven', ang.mc]]) {
+      const zl = norm(L - ayan), f = fmtDeg(zl);
+      const sl = norm(L - ayanL), nko = nakOf(sl), kl = kp && kpLords(sl);
+      const nk = `${shortNak(NAK_INFO[nko.n][0])} ${nko.pada}` + (kp ? `<br><span class="kp">${kpText(kl)}</span>` : '');
+      rows.push(`<tr><td class="g" style="color:#f5c66b">${name === 'Ascendant' ? '↑' : '⊼'}</td><td>${name}</td>
+        <td class="deg"><span class="sign-g">${SIGNS[f.sign][1]}${VS}</span>${f.text} ${SIGNS[f.sign][0]}</td><td></td>
+        <td class="nk"${kp ? ` title="${kpTitle(kl)}"` : ''}><span style="color:${'#' + PADA_INFO[nko.pada - 1].color.toString(16)}">●</span> ${nk}</td><td class="h"></td></tr>`);
+    }
+  }
+  $('table').innerHTML = rows.join('');
+  $('placementsTitle').textContent = `Placements · ${kp ? `KP (ayanamsa ${ayan.toFixed(2)}°) · sign·star·sub lords` : `Sidereal · Lahiri (ayanamsa ${ayan.toFixed(2)}°)`}`;
+  $('aspects').innerHTML = found.length ? found.slice(0, 24).map(f =>
+    `<span><span style="color:#${f.asp.color.toString(16)}">${byKey[f.a].glyph}${VS} ${f.asp.glyph} ${byKey[f.b].glyph}${VS}</span> ${f.asp.name} <span style="opacity:.6">${f.orb.toFixed(1)}°</span></span>`
+  ).join('') : '<span>None within orb</span>';
+
+  document.querySelectorAll('#table tr[data-key]').forEach(tr => {
+    tr.addEventListener('mouseenter', () => bodyObjs[tr.dataset.key].label.element.classList.add('hl'));
+    tr.addEventListener('mouseleave', () => bodyObjs[tr.dataset.key].label.element.classList.remove('hl'));
+    tr.addEventListener('click', () => selectBody(tr.dataset.key, true));
+  });
+
+  const ascZ = ang ? norm(ang.asc - ayan) : null;
+  for (const b of BODIES) chart[b.key].house = ang ? ((signIdx(chart[b.key].zlon) - signIdx(ascZ) + 12) % 12) + 1 : null;
+  lastChart = { chart, found, sidereal, ayan, ayanL, ascZ, utcMs };
+  renderProfile();
+  if (selectedKey) renderPopup(selectedKey);
+  if (tour.active) renderTour();
+}
+
+// smooth camera focus
+// pull the camera back on narrow/portrait screens so the whole wheel fits
+const homeCam = () => HOME_CAM.clone().multiplyScalar(camera.aspect < 0.6 ? 2.45 : camera.aspect < 0.85 ? 1.9 : camera.aspect < 1.2 ? 1.4 : 1);
+let focusTarget = { target: new THREE.Vector3(), cam: homeCam() }; // intro fly-in
+function focusOn(key) {
+  const p = bodyObjs[key].group.position;
+  focusTarget = { target: p.clone(), cam: p.clone().add(p.clone().normalize().multiplyScalar(-6)).add(new THREE.Vector3(0, 5, 0)) };
+}
+const hex = c => '#' + c.toString(16).padStart(6, '0');
+
+/* ============================================================
+   INTERPRETATION CARDS
+   ============================================================ */
+function interpretHTML(key, compact = false) {
+  if (!lastChart) return '';
+  const b = BODIES.find(x => x.key === key), info = PLANET_INFO[key], c = lastChart.chart[key];
+  const f = fmtDeg(c.zlon), sign = SIGNS[f.sign], si = SIGN_INFO[f.sign];
+  const dig = dignityOf(key, f.sign);
+  const nkd = c.nak, NK = NAK_INFO[nkd.n], PD = PADA_INFO[nkd.pada - 1];
+  const nk = `${NK[0]} pada ${nkd.pada}`;
+  const navSign = SIGNS[nkd.nav], rasiSid = Math.floor(c.slon / 30);
+  const retro = c.retro && !b.node;
+  const asp = lastChart.found.filter(x => x.a === key || x.b === key);
+  const byKey = Object.fromEntries(BODIES.map(x => [x.key, x]));
+  const chips = [...info.keys, sign[2][0].toUpperCase() + sign[2].slice(1), si.mod]
+    .map(k => `<span>${k}</span>`).join('') + (dig ? `<span class="dig">${dig[0]}</span>` : '') + (retro ? '<span class="dig">℞ Retrograde</span>' : '') +
+    `<span class="dig" style="border-color:${hex(PD.color)};color:${hex(PD.color)}">${PD.name} pada</span>` +
+    (rasiSid === nkd.nav ? '<span class="dig">Vargottama</span>' : '');
+  let html = `
+    <div class="ip-head">
+      <div class="ip-glyph">${b.glyph}${VS}</div>
+      <div><div class="ip-name">${b.name} in ${sign[0]} ${sign[1]}${VS}</div>
+      <div class="ip-pos">${f.text} ${sign[0]}${c.house ? ` · ${ordinal(c.house)} house` : ''} · ${nk}${retro ? ' · ℞' : ''}</div></div>
+    </div>
+    <div class="ip-chips">${chips}</div>
+    <div class="ip-sec"><h4>Core traits</h4><p>${info.core}</p></div>
+    <div class="ip-sec"><h4>Impact in ${sign[0]}</h4><p>${info.lead} ${si.how}. ${sign[0]} is a ${si.mod.toLowerCase()} ${sign[2]} sign ruled by ${si.ruler}.</p></div>`;
+  // ---- nakshatra + pada layer
+  const lordKey = LORD_KEY[nkd.lord];
+  let lordLine;
+  if (lordKey === key) lordLine = `${b.name} sits in a nakshatra it rules, so its natural expression is strengthened and undiluted.`;
+  else {
+    const lc = lastChart.chart[lordKey], lf = fmtDeg(lc.zlon), lb = BODIES.find(x => x.key === lordKey);
+    lordLine = `Its nakshatra lord is <b>${nkd.lord}</b>. Your ${lb.name} at ${lf.short} ${SIGNS[lf.sign][0]} (${NAK_INFO[lc.nak.n][0]}) shapes how this ${b.name} ultimately delivers its results.`;
+  }
+  html += `
+    <div class="ip-sec"><h4>Nakshatra · ${NK[0]}</h4>
+      <p>${info.lead} through <b>${NK[4]}</b>. ${NK[5]}</p>
+      <p style="margin-top:5px;color:var(--muted);font-size:12px">${NK[0]} is ruled by ${nkd.lord}. Its deity is ${NK[1]}, its symbol is ${NK[2]} and it belongs to the ${NK[3]} gana. ${lordLine}</p></div>
+    <div class="ip-sec"><h4>Pada ${nkd.pada} <span class="pada-badge" style="background:${hex(PD.color)}">${PD.name}</span></h4>
+      <p>${b.name}’s themes of ${info.keys[0].toLowerCase()} and ${info.keys[1].toLowerCase()} are channelled toward <b>${PD.focus}</b>. ${PD.text}</p>
+      <p style="margin-top:5px">In the navamsa (D9) this pada falls in <b>${navSign[0]} ${navSign[1]}${VS}</b>, so in its mature, inner expression it acts ${SIGN_INFO[nkd.nav].how.split(':')[0]}.${rasiSid === nkd.nav ? ` Because the sidereal sign and the navamsa are the same (${navSign[0]}), this ${b.name} is <b>vargottama</b>: strongly fortified and consistent inside and out.` : ''}</p></div>`;
+  if (c.house) {
+    const [title, area] = HOUSE_INFO[c.house - 1];
+    html += `<div class="ip-sec"><h4>${ordinal(c.house)} house · ${title}</h4><p>This energy plays out most strongly through ${area}.</p></div>`;
+  } else {
+    html += `<div class="ip-sec"><h4>House</h4><p class="muted">Pick your birth city to see which area of life this planet activates.</p></div>`;
+  }
+  if (dig) html += `<div class="ip-sec"><h4>Strength · ${dig[0]}</h4><p>${b.name} is ${dig[1]}.</p></div>`;
+  if (retro && info.retro) html += `<div class="ip-sec"><h4>℞ Retrograde at birth</h4><p>${info.retro}</p></div>`;
+  if (asp.length && !compact) {
+    html += `<div class="ip-sec"><h4>Aspects</h4><div class="ip-asp">${asp.map(x => {
+      const other = byKey[x.a === key ? x.b : x.a];
+      return `<div><span style="color:${hex(x.asp.color)}">${x.asp.glyph}</span> ${x.asp.name} ${other.glyph}${VS} ${other.name} <span style="opacity:.55">(${x.orb.toFixed(1)}° orb)</span></div>`;
+    }).join('')}</div></div>`;
+  }
+  return html;
+}
+
+/* ---------- Planet popup ---------- */
+let selectedKey = null;
+const popup = $('popup');
+function renderPopup(key) { $('popupBody').innerHTML = interpretHTML(key); }
+function selectBody(key, fly = false) {
+  if (tour.active) return;
+  selectedKey = key;
+  const col = hex(bodyObjs[key].def.color);
+  popup.style.setProperty('--pc', col);
+  renderPopup(key);
+  popup.style.display = 'block';
+  requestAnimationFrame(() => popup.classList.add('show'));
+  halo.material.color.set(bodyObjs[key].def.color);
+  halo.visible = true;
+  if (isMobile()) openSheet(null);
+  if (fly) focusOn(key);
+}
+function closePopup() {
+  selectedKey = null; halo.visible = false;
+  popup.classList.remove('show');
+  setTimeout(() => { if (!selectedKey) popup.style.display = 'none'; }, 250);
+}
+$('popupClose').addEventListener('click', closePopup);
+
+function positionPopup() {
+  if (isMobile()) { popup.style.visibility = 'visible'; return; }
+  if (!selectedKey || popup.style.display === 'none') return;
+  const p = bodyObjs[selectedKey].group.position.clone().project(camera);
+  if (p.z > 1) { popup.style.visibility = 'hidden'; return; }
+  popup.style.visibility = 'visible';
+  const x = (p.x + 1) / 2 * innerWidth, y = (1 - p.y) / 2 * innerHeight;
+  const w = popup.offsetWidth, h = popup.offsetHeight, gap = 36;
+  let left = x + gap;
+  if (left + w > innerWidth - 12) left = x - gap - w;
+  left = Math.max(12, Math.min(left, innerWidth - w - 12));
+  const top = Math.max(12, Math.min(y - h / 2, innerHeight - h - 12));
+  popup.style.left = left + 'px'; popup.style.top = top + 'px';
+}
+
+/* ============================================================
+   GUIDED TOUR (click Earth)
+   ============================================================ */
+const TOUR_ORDER = BODIES.map(b => b.key);
+const TOUR_STEP = 9; // seconds per planet
+const tour = { active: false, idx: 0, elapsed: 0, paused: false, ang: 0, dist: 0, h: 0, look: new THREE.Vector3() };
+
+function startTour() {
+  if (tour.active || !lastChart) return;
+  closePopup(); openSheet(null);
+  Object.assign(tour, { active: true, idx: 0, elapsed: 0, paused: false });
+  // begin from current camera orientation so the swoop is continuous
+  tour.ang = Math.atan2(-camera.position.z, camera.position.x) * R2D;
+  tour.dist = Math.hypot(camera.position.x, camera.position.z);
+  tour.h = camera.position.y;
+  tour.look.copy(controls.target);
+  controls.enabled = false; focusTarget = null;
+  applyTourViewOffset();
+  document.body.classList.add('touring');
+  $('tourDots').innerHTML = TOUR_ORDER.map((k, i) => `<i data-i="${i}" title="${bodyObjs[k].def.name}"></i>`).join('');
+  const el = $('tour'); el.style.display = 'block'; requestAnimationFrame(() => el.classList.add('show'));
+  renderTour();
+}
+function applyTourViewOffset() {
+  camera.setViewOffset(innerWidth, innerHeight, 0, innerHeight * (isMobile() ? 0.24 : 0.2), innerWidth, innerHeight);
+}
+function renderTour() {
+  const key = TOUR_ORDER[tour.idx], col = hex(bodyObjs[key].def.color);
+  $('tour').style.setProperty('--pc', col);
+  $('tourBody').innerHTML = interpretHTML(key, true);
+  $('tourBody').scrollTop = 0;
+  [...$('tourDots').children].forEach((d, i) => d.classList.toggle('on', i === tour.idx));
+  $('tourPause').textContent = tour.paused ? '▶ Play' : '❚❚ Pause';
+  Object.values(bodyObjs).forEach(o => o.label.element.classList.toggle('hl', o.def.key === key));
+  halo.material.color.set(bodyObjs[key].def.color); halo.visible = true;
+  beam.material.color.set(bodyObjs[key].def.color); beam.visible = true;
+}
+function tourGo(i) {
+  tour.idx = (i + TOUR_ORDER.length) % TOUR_ORDER.length; tour.elapsed = 0; renderTour();
+}
+function exitTour() {
+  if (!tour.active) return;
+  tour.active = false;
+  document.body.classList.remove('touring');
+  const el = $('tour'); el.classList.remove('show'); setTimeout(() => { if (!tour.active) el.style.display = 'none'; }, 400);
+  Object.values(bodyObjs).forEach(o => o.label.element.classList.remove('hl'));
+  halo.visible = false; beam.visible = false;
+  controls.target.copy(tour.look); controls.enabled = true;
+  camera.clearViewOffset();
+  focusTarget = { target: new THREE.Vector3(), cam: homeCam() };
+}
+$('tourPrev').addEventListener('click', () => tourGo(tour.idx - 1));
+$('tourNext').addEventListener('click', () => tourGo(tour.idx + 1));
+$('tourPause').addEventListener('click', () => { tour.paused = !tour.paused; renderTour(); });
+$('tourExit').addEventListener('click', exitTour);
+$('tourDots').addEventListener('click', e => { if (e.target.dataset.i) tourGo(+e.target.dataset.i); });
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'Escape') { if (tour.active) exitTour(); else closePopup(); }
+  if (!tour.active) return;
+  if (e.key === 'ArrowRight') tourGo(tour.idx + 1);
+  if (e.key === 'ArrowLeft') tourGo(tour.idx - 1);
+  if (e.key === ' ') { tour.paused = !tour.paused; renderTour(); e.preventDefault(); }
+});
+
+function updateTourCamera(dt) {
+  const key = TOUR_ORDER[tour.idx], o = bodyObjs[key];
+  if (!tour.paused) {
+    tour.elapsed += dt;
+    if (tour.elapsed >= TOUR_STEP) tourGo(tour.idx + 1);
+  }
+  $('tourBar').style.width = Math.min(100, tour.elapsed / TOUR_STEP * 100) + '%';
+  // camera sits just over Earth's shoulder, swinging around to face each planet
+  const lon = o.cur.lon;
+  const wantAng = lon + 180 + 38 + Math.sin(tour.elapsed * 0.35) * 6; // gentle drift while reading
+  let d = wantAng - tour.ang; d = ((d % 360) + 540) % 360 - 180;
+  const k = 1 - Math.pow(0.12, dt); // frame-rate independent easing
+  tour.ang += d * k * 0.9;
+  tour.dist += (3.6 - tour.dist) * k;
+  tour.h += (1.7 - tour.h) * k;
+  camera.position.set(tour.dist * cosD(tour.ang), tour.h, -tour.dist * sinD(tour.ang));
+  tour.look.lerp(o.group.position, k);
+  camera.lookAt(tour.look);
+  beam.geometry.setFromPoints([new THREE.Vector3(0, 0, 0), o.group.position]);
+}
+
+/* ---------- Picking ---------- */
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let downPos = null, hoverKey = null;
+function pick(ev) {
+  const r = renderer.domElement.getBoundingClientRect();
+  pointer.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(pointer, camera);
+  const targets = [earth, ...Object.values(bodyObjs).filter(o => o.group.visible).map(o => o.hit)];
+  const hit = raycaster.intersectObjects(targets, false)[0];
+  return hit ? hit.object.userData.key : null;
+}
+renderer.domElement.addEventListener('pointerdown', e => { downPos = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!downPos || Math.hypot(e.clientX - downPos[0], e.clientY - downPos[1]) > 5) return;
+  const key = pick(e);
+  if (tour.active) { if (key && key !== 'earth') tourGo(TOUR_ORDER.indexOf(key)); return; }
+  if (key === 'earth') startTour();
+  else if (key) selectBody(key);
+  else closePopup();
+});
+renderer.domElement.addEventListener('pointermove', e => {
+  hoverKey = pick(e);
+  renderer.domElement.style.cursor = hoverKey ? 'pointer' : 'grab';
+});
+
+/* ============================================================
+   ANIMATION
+   ============================================================ */
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.1);
+  const t = clock.elapsedTime;
+
+  for (const o of Object.values(bodyObjs)) {
+    if (!o.target) { o.group.visible = false; o.ray.visible = false; o.tick.visible = false; continue; }
+    o.group.visible = true;
+    let dl = o.target.lon - o.cur.lon; dl = ((dl + 540) % 360) - 180;
+    o.cur.lon += dl * 0.06; o.cur.lat += (o.target.lat - o.cur.lat) * 0.06;
+    const pos = eclToVec(o.cur.lon, o.cur.lat, o.def.r);
+    o.group.position.copy(pos);
+    o.mesh.rotation.y = t * 0.4;
+    if (o.def.node) o.mesh.rotation.x = t * 0.8;
+    const hovered = hoverKey === o.def.key;
+    const sc = o.mesh.scale.x + ((hovered ? 1.35 : 1) - o.mesh.scale.x) * 0.15;
+    o.mesh.scale.setScalar(sc);
+    if (o.def.key === 'sun') sunLight.position.copy(pos);
+    const ringPt = eclToVec(o.cur.lon, 0, ZODIAC_IN);
+    o.tick.position.copy(ringPt);
+    o.tick.visible = true;
+    o.ray.visible = $('tRays').checked;
+    o.ray.geometry.setFromPoints([pos, ringPt]);
+    o.ray.computeLineDistances();
+  }
+  for (const al of aspectLines) al.line.geometry.setFromPoints([bodyObjs[al.a].group.position, bodyObjs[al.b].group.position]);
+  aspectGroup.visible = $('tAspects').checked;
+  starGroup.visible = $('tStars').checked;
+  nakGroup.visible = $('tNak').checked;
+  constGroup.visible = $('tConst').checked;
+  $('legend').style.display = $('tAspects').checked ? '' : 'none';
+  earth.rotation.y = t * 0.15;
+  earth.scale.setScalar(earth.scale.x + ((hoverKey === 'earth' ? 1.12 : 1) - earth.scale.x) * 0.15);
+
+  // halo around selected / toured planet
+  const haloKey = tour.active ? TOUR_ORDER[tour.idx] : selectedKey;
+  if (haloKey && halo.visible) {
+    const o = bodyObjs[haloKey];
+    halo.position.copy(o.group.position);
+    halo.scale.setScalar(o.def.size * (1.9 + Math.sin(t * 3) * 0.12));
+    halo.quaternion.copy(camera.quaternion);
+  }
+
+  if (tour.active) {
+    updateTourCamera(dt);
+    beam.material.opacity = 0.55 + Math.sin(t * 4) * 0.25;
+  } else {
+    controls.autoRotate = $('tRotate').checked;
+    if (focusTarget) {
+      controls.target.lerp(focusTarget.target, 0.05);
+      camera.position.lerp(focusTarget.cam, 0.05);
+      if (camera.position.distanceTo(focusTarget.cam) < 0.05) focusTarget = null;
+    }
+    controls.update();
+  }
+  composer.render();
+  labelRenderer.render(scene, camera);
+  positionPopup();
+}
+
+/* ============================================================
+   EVENTS
+   ============================================================ */
+$('calc').addEventListener('click', () => { calculate(); if (isMobile()) openSheet(null); });
+
+/* ---------- mobile bottom sheets ---------- */
+function openSheet(id) {
+  ['panel', 'profile'].forEach(x => $(x).classList.toggle('sheet-open', x === id));
+  document.body.classList.toggle('sheet-up', !!id);
+  document.querySelectorAll('#tabbar button').forEach(b =>
+    b.classList.toggle('on', id ? b.dataset.sheet === id : b.dataset.act === 'sky'));
+  if (id) closePopup();
+}
+$('tabbar').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.sheet) openSheet($(b.dataset.sheet).classList.contains('sheet-open') ? null : b.dataset.sheet);
+  else if (b.dataset.act === 'tour') startTour();
+  else openSheet(null);
+});
+// swipe a sheet down from its top to close it
+for (const id of ['panel', 'profile']) {
+  let y0 = null;
+  $(id).addEventListener('touchstart', e => { y0 = $(id).scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
+  $(id).addEventListener('touchend', e => {
+    if (y0 != null && e.changedTouches[0].clientY - y0 > 70) openSheet(null);
+    y0 = null;
+  });
+}
+function applyLayout() {
+  if (isMobile()) $('profile').classList.remove('hidden');
+  else { openSheet(null); if (innerWidth <= 1100) $('profile').classList.add('hidden'); }
+}
+mqMobile.addEventListener('change', applyLayout);
+$('pfHide').addEventListener('click', () => $('profile').classList.add('hidden'));
+$('pfShare').addEventListener('click', shareProfile);
+$('shareClose').addEventListener('click', () => { $('shareModal').hidden = true; URL.revokeObjectURL($('shareImg').src); });
+$('shareModal').addEventListener('click', e => { if (e.target === $('shareModal')) $('shareClose').click(); });
+document.querySelectorAll('.pf-tabs button').forEach(b => {
+  b.classList.toggle('on', b.dataset.tab === profileTab);
+  b.addEventListener('click', () => setProfileTab(b.dataset.tab));
+});
+document.querySelectorAll('.pf-mode button').forEach(b => {
+  b.classList.toggle('on', b.dataset.mode === profileMode);
+  b.addEventListener('click', () => setProfileMode(b.dataset.mode));
+});
+$('pfShow').addEventListener('click', () => $('profile').classList.remove('hidden'));
+$('now').addEventListener('click', () => { setNow(); calculate(); });
+$('zodiac').addEventListener('change', calculate);
+['date', 'time', 'lat', 'lon'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); }));
+$('geo').addEventListener('click', () => {
+  if (!navigator.geolocation) return alert('Geolocation not available');
+  navigator.geolocation.getCurrentPosition(p => {
+    $('lat').value = p.coords.latitude.toFixed(4);
+    $('lon').value = p.coords.longitude.toFixed(4);
+    customLocation('Current device location');
+    calculate();
+  }, err => alert('Could not get location: ' + err.message));
+});
+renderer.domElement.addEventListener('dblclick', () => {
+  if (tour.active) return;
+  focusTarget = { target: new THREE.Vector3(), cam: homeCam() };
+});
+controls.addEventListener('start', () => { focusTarget = null; });
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); labelRenderer.setSize(innerWidth, innerHeight);
+  if (tour.active) applyTourViewOffset();
+  composer.setSize(innerWidth, innerHeight); bloom.resolution.set(innerWidth, innerHeight);
+});
+
+/* ============================================================
+   ACCESS PIN GATE
+   Client-side only: deters casual visitors, but is not real security
+   (the check runs in the browser). Only a hash of the PIN is stored here.
+   ============================================================ */
+const PIN_HASH = '6a02bae4';           // fnv1a('celestial-chart::' + PIN)
+const UNLOCK_KEY = 'celestial-unlocked';
+function pinHash(pin) {
+  let h = 0x811c9dc5;
+  for (const c of 'celestial-chart::' + pin) { h ^= c.charCodeAt(0); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h.toString(16);
+}
+
+function boot() {
+  document.body.classList.remove('locked');
+  $('gate').classList.add('gone');
+  setTimeout(() => $('gate').remove(), 700);
+  applyLayout();
+  if (isMobile()) openSheet('panel');
+  populateTimezones();
+  initPlacePickers();
+  $('date').value = DEFAULT_DATE;
+  $('time').value = DEFAULT_TIME;
+  calculate();
+  animate();
+}
+
+(function pinGate() {
+  if (sessionStorage.getItem(UNLOCK_KEY) === PIN_HASH) return boot();
+  const boxes = [...document.querySelectorAll('#pin input')], pinEl = $('pin'), msg = $('gateMsg');
+  let fails = 0, lockedUntil = 0;
+  boxes[0].focus();
+  const clear = () => { boxes.forEach(b => (b.value = '')); boxes[0].focus(); };
+  const check = () => {
+    const pin = boxes.map(b => b.value).join('');
+    if (pin.length < 4) return;
+    if (Date.now() < lockedUntil) return;
+    if (pinHash(pin) === PIN_HASH) {
+      msg.className = 'gate-msg ok'; msg.textContent = 'Unlocked ✦';
+      sessionStorage.setItem(UNLOCK_KEY, PIN_HASH);
+      boxes.forEach(b => b.blur());
+      setTimeout(boot, 250);
+      return;
+    }
+    fails++;
+    pinEl.classList.add('err', 'shake');
+    setTimeout(() => pinEl.classList.remove('shake'), 400);
+    if (fails >= 5) {
+      lockedUntil = Date.now() + 30000; fails = 0;
+      boxes.forEach(b => (b.disabled = true));
+      let left = 30;
+      msg.textContent = `Too many attempts. Try again in ${left}s`;
+      const iv = setInterval(() => {
+        left--; msg.textContent = `Too many attempts. Try again in ${left}s`;
+        if (left <= 0) { clearInterval(iv); boxes.forEach(b => (b.disabled = false)); msg.textContent = ''; pinEl.classList.remove('err'); clear(); }
+      }, 1000);
+    } else {
+      msg.textContent = `Incorrect PIN (${5 - fails} attempt${5 - fails === 1 ? '' : 's'} left)`;
+    }
+    setTimeout(clear, 350);
+  };
+  boxes.forEach((b, i) => {
+    b.addEventListener('input', () => {
+      b.value = b.value.replace(/\D/g, '').slice(-1);
+      pinEl.classList.remove('err');
+      if (b.value && i < 3) boxes[i + 1].focus();
+      check();
+    });
+    b.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !b.value && i > 0) { boxes[i - 1].focus(); boxes[i - 1].value = ''; }
+      if (e.key === 'ArrowLeft' && i > 0) boxes[i - 1].focus();
+      if (e.key === 'ArrowRight' && i < 3) boxes[i + 1].focus();
+    });
+    b.addEventListener('paste', e => {
+      const digits = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 4);
+      if (!digits) return;
+      e.preventDefault();
+      digits.split('').forEach((d, j) => { if (boxes[j]) boxes[j].value = d; });
+      boxes[Math.min(digits.length, 3)].focus();
+      check();
+    });
+  });
+  $('gateForm').addEventListener('submit', e => { e.preventDefault(); check(); });
+})();
+</script>
+</body>
+</html>

@@ -96,7 +96,7 @@ private struct MainTabs: View {
                     .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { openSession = nil } } }
             }
         }
-        .fullScreenCover(isPresented: $showSky) { SkyCover(c: c) { showSky = false } }
+        .fullScreenCover(isPresented: $showSky) { WebSkyView(profile: c.profileStore.profile) { showSky = false } }
         // Opened from the weekly notification or widget, or birth details just entered: jump to that tab.
         .onChange(of: router.requestedTab, initial: true) { _, t in
             guard let t else { return }
@@ -126,25 +126,5 @@ private struct TabBarProbe: View {
     private func rect(_ g: GeometryProxy) -> CGRect? {
         let f = g.frame(in: .global)
         return CGRect(x: f.minX + 8, y: f.maxY, width: f.width - 16, height: 200)
-    }
-}
-
-/// ~5,000 stars and 89 constellations are positioned once, in the background.
-private struct SkyCover: View {
-    let c: AppContainer
-    let close: () -> Void
-    @State private var sky: (SkyScene, Int, String)?
-
-    var body: some View {
-        ZStack {
-            Color(argb: 0xFF03040B).ignoresSafeArea()
-            if let sky { SkyView(scene: sky.0, sky.1, sky.2, onClose: close) }
-            else { ProgressView().tint(Cosmic.gold) }
-        }
-        .task {
-            let profile = c.profileStore.profile, catalog = c.skyCatalog
-            let result = await Task.detached(priority: .userInitiated) { fullSkyFor(profile, catalog) }.value
-            if let result { sky = result } else { close() }
-        }
     }
 }

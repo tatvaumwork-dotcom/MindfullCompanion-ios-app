@@ -100,6 +100,7 @@ struct PlanetsView: View {
                         }
                         .guideTarget(.skyView)
                         PrimaryButton(text: "Open full-screen sky", icon: "sparkles", action: onOpenSky)
+                            .guideTarget(.fullSky)
                         if let p = sky.planets.first(where: { $0.planet == selected }) {
                             PlanetDetail(p: p, ascSign: sky.ascSign)
                         } else {

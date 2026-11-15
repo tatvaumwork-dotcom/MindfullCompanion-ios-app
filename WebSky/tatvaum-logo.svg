@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="627" height="627" viewBox="0 0 1254 1254">
+  <defs>
+    <!-- removes the stretch of orbit where the planet sits -->
+    <clipPath id="gap">
+      <path d="M0,0 H1254 V1254 H0 Z M889,633 L1150,548 L1150,800 Z" clip-rule="evenodd"/>
+    </clipPath>
+  </defs>
+  <rect x="0" y="0" width="1254" height="1254" fill="#FDF8F1"/>
+  <rect x="58" y="58" width="1138" height="1138" rx="250" fill="#000000"/>
+  <g fill="#FDF8F1">
+    <!-- orbit: outer ellipse minus an offset inner one, so it is thick at left and thin at right -->
+    <g clip-path="url(#gap)">
+      <path fill-rule="evenodd" transform="rotate(-13 640 600)"
+        d="M228,600 A412,168 0 1,0 1052,600 A412,168 0 1,0 228,600 Z
+           M300,603 A368,118 0 1,0 1036,603 A368,118 0 1,0 300,603 Z"/>
+    </g>
+    <!-- t stem with angled top -->
+    <path d="M540,322 L643,250 L643,800 C643,862 672,912 722,920 C764,926 806,912 836,890 C846,884 852,893 846,902 C818,948 772,986 706,986 C612,986 541,906 541,800 Z"/>
+    <!-- planet with a dark halo so the orbit reads as passing into it -->
+    <circle cx="889" cy="633" r="61" fill="#000000"/>
+    <circle cx="889" cy="633" r="57"/>
+  </g>
+</svg>
