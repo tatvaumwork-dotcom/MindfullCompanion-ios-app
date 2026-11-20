@@ -1,1 +1,45 @@
 
+workflows:
+  ios-testflight:
+    name: Tatvaum Connect - TestFlight
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+
+    integrations:
+      app_store_connect: codemagic
+
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.tatvaum.connect
+
+      xcode: latest
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+
+    scripts:
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles
+
+      - name: Build Tatvaum Connect IPA
+        script: |
+          xcode-project build-ipa \
+            --project "$CM_BUILD_DIR/TatvaumConnect.xcodeproj" \
+            --scheme "TatvaumConnect"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
